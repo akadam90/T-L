@@ -1,0 +1,729 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Threading.Tasks;
+using TestAndLearn.Domain.Models;
+
+namespace TestAndLearn.Domain.Infrastructure
+{
+    public class TestRepository : ITestRepository
+    {
+        public void SaveBaseTest(TestBaseModel testModel)
+        {
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                Test test = null;
+                
+                if (testModel.TestId > 0)
+                {
+                    test = connection.Tests.SingleOrDefault(f => f.TestId == testModel.TestId);
+
+                    if (test == null)
+                    {
+                        throw new Exception("Could not find Test with TestId: " + testModel.TestId + " in the database table.");
+                    }
+                    else
+                    {
+                        //update
+                        //test.TestId = testModel.TestId;
+                        //test.ClientId = testModel.ClientId;
+                        test.Name = testModel.Name;
+                        test.SubmittedBy = testModel.SubmittedBy;
+                        test.Hypothesis = testModel.Hypothesis;
+                        test.AdditionalNotes = testModel.AdditionalNotes;
+                        test.ExpectedBusinessValue = testModel.ExpectedBusinessValue;
+                        test.Quarter = testModel.Quarter;
+                        test.Year = testModel.Year;
+                        test.SuccessMetricId = testModel.SuccessMetric.SuccessMetricId;
+                        test.PillarId = testModel.Pillar.PillarId;
+                        
+                        //update test types
+                        for (var i = test.TestTypes.Count - 1; i >= 0; i--)
+                        {
+                            var testType = test.TestTypes.ElementAt(i);
+                            var tt = connection.Clients.Single(f => f.ClientId == testModel.ClientId).TestTypes.SingleOrDefault(f => f.TestTypeId == testType.TestTypeId);
+
+                            if (tt == null)
+                            {
+                                throw new Exception("The TestTypeId: " + testType.TestTypeId + " is not valid for client: " + testModel.ClientId);
+                            }
+                            else
+                            {
+                                if (testModel.TestTypes.SingleOrDefault(f => f.TestTypeId == tt.TestTypeId) == null)
+                                {
+                                    test.TestTypes.Remove(tt);
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    test = new Test()
+                    {
+                        ClientId = testModel.ClientId,
+                        Name = testModel.Name,
+                        SubmittedOn = DateTime.Today,
+                        SubmittedBy = testModel.SubmittedBy,
+                        Hypothesis = testModel.Hypothesis,
+                        AdditionalNotes = testModel.AdditionalNotes,
+                        ExpectedBusinessValue = testModel.ExpectedBusinessValue,
+                        Quarter = testModel.Quarter,
+                        Year = testModel.Year,
+                        SuccessMetricId = testModel.SuccessMetric.SuccessMetricId,
+                        PillarId = testModel.Pillar.PillarId
+                    };
+
+                    //update status
+                    var status = connection.TestStatus.SingleOrDefault(f => f.Name.Trim().ToLower() == "submitted");
+                    
+                    if (status == null)
+                    {
+                        throw new Exception("The Status: " + testModel.Status + " does not exist in the system.");
+                    }
+
+                    test.TestStatusId = status.TestStatusId;
+
+                    connection.Tests.Add(test);
+                }
+
+                
+
+                foreach (var testType in testModel.TestTypes)
+                {
+                    //check to see if this type is allowed by this client
+                    var tt = connection.Clients.Single(f => f.ClientId == testModel.ClientId).TestTypes.SingleOrDefault(f => f.TestTypeId == testType.TestTypeId);
+
+                    if (tt == null)
+                    {
+                        throw new Exception("The TestTypeId: " + testType.TestTypeId + " is not valid for client: " + testModel.ClientId);
+                    }
+                    else
+                    {
+                        //now check to see if it exists on the test
+                        if (test.TestTypes.Contains(tt) == false)
+                        {
+                            test.TestTypes.Add(tt);
+                        }
+                    }
+                }
+
+                connection.SaveChanges();
+            }
+        }
+
+        public TestModel GetTest(int testId)
+        {
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                var test = (from t in connection.Tests
+                            .Include("Client")
+                            .Include("TestStatu")
+                            .Include("TestTypes")
+                            .Include("SuccessMetrics")
+                             where
+                                 t.TestId == testId
+                             select new TestModel()
+                             {
+                                 TestId = t.TestId,
+                                 ClientId = t.ClientId,
+                                 Name = t.Name,
+                                 SubmittedOn = t.SubmittedOn,
+                                 SubmittedBy = t.SubmittedBy,
+                                 Hypothesis = t.Hypothesis,
+                                 AdditionalNotes = t.AdditionalNotes,
+                                 ExpectedBusinessValue = t.ExpectedBusinessValue,
+                                 Quarter = t.Quarter,
+                                 Year = t.Year,
+                                 Status = t.TestStatu.Name,
+                                 StartDate = t.StartDate,
+                                 EndDate = t.EndDate,
+                                 Outcome = t.Outcome,
+                                 Recommendation = t.Recommendation,
+                                 LevelOfEffortToImplement = t.LevelOfEffortToImplement,
+                                 LevelOfEffortToReportOn = t.LevelOfEffortToReportOn,
+                                 LevelOfBudget = t.LevelOfBudget,
+                                 LevelOfImpact = t.LevelOfImpact,
+                                 TestTypes = (from tt in t.TestTypes select new TestTypeModel() { TestTypeId = tt.TestTypeId, Name = tt.Name }).ToList(),
+                                 SuccessMetric = t.SuccessMetricId.HasValue ?
+                                 new SuccessMetricModel()
+                                 {
+                                     SuccessMetricId = t.SuccessMetricId,
+                                     Name = t.SuccessMetric.Name
+                                 }
+                                 :
+                                 null,
+                                 Pillar = (t.PillarId.HasValue) ?
+                                 new PillarModel()
+                                 {
+                                     PillarId = t.PillarId,
+                                     Name = t.Pillar.Name
+                                 }
+                                 :
+                                 null
+                             }).SingleOrDefault();
+
+
+                return test;
+            }
+        }
+
+        public IList<TestModel> GetTests(int clientId)
+        {
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                var tests = (from t in connection.Tests
+                            .Include("Client")
+                            .Include("TestStatu")
+                            .Include("TestTypes")
+                            .Include("SuccessMetrics")
+                            where 
+                                t.ClientId == clientId
+                            select new TestModel()
+                            {
+                                TestId = t.TestId,
+                                ClientId = t.ClientId,
+                                Name = t.Name,
+                                SubmittedOn = t.SubmittedOn,
+                                SubmittedBy = t.SubmittedBy,
+                                Hypothesis = t.Hypothesis,
+                                AdditionalNotes = t.AdditionalNotes,
+                                ExpectedBusinessValue = t.ExpectedBusinessValue,
+                                Quarter = t.Quarter,
+                                Year = t.Year,
+                                Status = t.TestStatu.Name,
+                                StartDate = t.StartDate,
+                                EndDate = t.EndDate,
+                                Outcome = t.Outcome,
+                                Recommendation = t.Recommendation,
+                                LevelOfEffortToImplement = t.LevelOfEffortToImplement,
+                                LevelOfEffortToReportOn = t.LevelOfEffortToReportOn,
+                                LevelOfBudget = t.LevelOfBudget,
+                                LevelOfImpact = t.LevelOfImpact,
+                                TestTypes = (from tt in t.TestTypes select new TestTypeModel() { TestTypeId = tt.TestTypeId, Name = tt.Name }).ToList(),
+                                SuccessMetric = t.SuccessMetricId.HasValue ?
+                                 new SuccessMetricModel()
+                                 {
+                                     SuccessMetricId = t.SuccessMetricId,
+                                     Name = t.SuccessMetric.Name
+                                 }
+                                 :
+                                 null,
+                                Pillar = (t.PillarId.HasValue) ?
+                                new PillarModel()
+                                {
+                                    PillarId = t.PillarId,
+                                    Name = t.Pillar.Name
+                                }
+                                :
+                                null
+                            }).ToList();
+
+
+                return tests;
+            }
+        }
+
+        public IList<TestModel> GetTests(int clientId, int statusId)
+        {
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                var tests = (from t in connection.Tests
+                            .Include("Client")
+                            .Include("TestStatu")
+                            .Include("TestTypes")
+                            .Include("SuccessMetrics")
+                             where
+                                 t.ClientId == clientId 
+                                 &&
+                                 t.TestStatusId == statusId
+                             select new TestModel()
+                             {
+                                 TestId = t.TestId,
+                                 ClientId = t.ClientId,
+                                 Name = t.Name,
+                                 SubmittedOn = t.SubmittedOn,
+                                 SubmittedBy = t.SubmittedBy,
+                                 Hypothesis = t.Hypothesis,
+                                 AdditionalNotes = t.AdditionalNotes,
+                                 ExpectedBusinessValue = t.ExpectedBusinessValue,
+                                 Quarter = t.Quarter,
+                                 Year = t.Year,
+                                 Status = t.TestStatu.Name,
+                                 StartDate = t.StartDate,
+                                 EndDate = t.EndDate,
+                                 Outcome = t.Outcome,
+                                 Recommendation = t.Recommendation,
+                                 LevelOfEffortToImplement = t.LevelOfEffortToImplement,
+                                 LevelOfEffortToReportOn = t.LevelOfEffortToReportOn,
+                                 LevelOfBudget = t.LevelOfBudget,
+                                 LevelOfImpact = t.LevelOfImpact,
+                                 TestTypes = (from tt in t.TestTypes select new TestTypeModel() { TestTypeId = tt.TestTypeId, Name = tt.Name }).ToList(),
+                                 SuccessMetric = t.SuccessMetricId.HasValue ?
+                                 new SuccessMetricModel()
+                                 {
+                                     SuccessMetricId = t.SuccessMetricId,
+                                     Name = t.SuccessMetric.Name
+                                 }
+                                 :
+                                 null,
+                                 Pillar = (t.PillarId.HasValue) ?
+                                 new PillarModel()
+                                 {
+                                     PillarId = t.PillarId,
+                                     Name = t.Pillar.Name
+                                 }
+                                 :
+                                 null
+                             }).ToList();
+
+
+                return tests;
+            }
+        }
+
+        public IList<TestModel> GetTests(IList<int> testIds)
+        {
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                var tests = connection.Tests
+                            .Include("Client")
+                            .Include("TestStatu")
+                            .Include("TestTypes")
+                            .Include("SuccessMetrics")
+                            .Where(BuildContainsExpression<Test, int>(e => e.TestId, testIds))
+                             .Select(t => new TestModel()
+                             {
+                                 TestId = t.TestId,
+                                 ClientId = t.ClientId,
+                                 Name = t.Name,
+                                 SubmittedOn = t.SubmittedOn,
+                                 SubmittedBy = t.SubmittedBy,
+                                 Hypothesis = t.Hypothesis,
+                                 AdditionalNotes = t.AdditionalNotes,
+                                 ExpectedBusinessValue = t.ExpectedBusinessValue,
+                                 Quarter = t.Quarter,
+                                 Year = t.Year,
+                                 Status = t.TestStatu.Name,
+                                 StartDate = t.StartDate,
+                                 EndDate = t.EndDate,
+                                 Outcome = t.Outcome,
+                                 Recommendation = t.Recommendation,
+                                 LevelOfEffortToImplement = t.LevelOfEffortToImplement,
+                                 LevelOfEffortToReportOn = t.LevelOfEffortToReportOn,
+                                 LevelOfBudget = t.LevelOfBudget,
+                                 LevelOfImpact = t.LevelOfImpact,
+                                 TestTypes = (from tt in t.TestTypes select new TestTypeModel() { TestTypeId = tt.TestTypeId, Name = tt.Name }).ToList(),
+                                 SuccessMetric = t.SuccessMetricId.HasValue ?
+                                 new SuccessMetricModel()
+                                 {
+                                     SuccessMetricId = t.SuccessMetricId,
+                                     Name = t.SuccessMetric.Name
+                                 }
+                                 :
+                                 null,
+                                 Pillar = (t.PillarId.HasValue) ?
+                                 new PillarModel()
+                                 {
+                                     PillarId = t.PillarId,
+                                     Name = t.Pillar.Name
+                                 }
+                                 :
+                                 null
+                             })
+                             .ToList();
+
+
+                return tests;
+            }
+        }
+
+        //Filtering function
+        public IList<TestModel> GetTests(FilterTestModel filterModel)
+        {
+            Boolean isValid=false;
+
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                //first check each property on the filterModel for a value
+                //get a join of these tables
+                var tests = connection.Tests
+                            .Include("Client")
+                            .Include("TestStatu")
+                            .Include("TestTypes")
+                            .Include("SuccessMetrics")
+                            .AsQueryable()
+                            .Where(f => f.ClientId == filterModel.ClientId && filterModel.TestStatusId == filterModel.TestStatusId);               
+
+                if (!string.IsNullOrEmpty(filterModel.SubmittedOnQuery))
+                {
+                    int[] months = new int[]{31,28,31,30,31,30,31,31,30,31,30,31};
+
+                    //check to see if its valid
+                    String[] d = filterModel.SubmittedOnQuery.Split('/');
+                    if (d.Length > 0)
+                    { 
+                        int m = Convert.ToInt32(d[0]);
+                        if (m > 0 && m <= 12)       //validate month
+                        {
+                            if (d.Length > 1)
+                            {
+                                int date = Convert.ToInt32(d[1]);
+                                if (m == 2)
+                                {
+                                    if (date > 0 && date <= 29)
+                                        isValid = true;
+                                    else
+                                        isValid = false;
+                                }
+
+                                else 
+                                {
+                                    if (date > 0 && date <= months[m])
+                                        isValid = true;
+                                    else
+                                        isValid = false;
+                                }
+                            }
+
+                            if (d.Length == 3)  //for year
+                            {                             
+                            }
+
+                        }
+                        else   //for date
+                        {
+                            isValid = false;
+                        }
+                    }
+
+                    if (isValid == true)
+                        //someone attempted to add a submitted on filter
+                      tests = tests.Where(f => f.SubmittedOn.ToShortDateString().Contains(filterModel.SubmittedOnQuery));      
+                }
+
+                if (!string.IsNullOrEmpty(filterModel.NameQuery))
+                    tests = tests.Where(f=>f.Name.Contains(filterModel.NameQuery));
+
+                if (!string.IsNullOrEmpty(filterModel.SubmittedByQuery))
+                   tests = tests.Where(f=>f.SubmittedBy.Contains(filterModel.SubmittedByQuery));
+                
+                //if (!string.IsNullOrEmpty(filterModel.TestTypesQuery))
+                    
+                //    tests.Where(f=>f));
+                //        Where(f => f.TestTypes);
+                //       .Contains(filterModel.TestTypesQuery));
+
+                //if (!string.IsNullOrEmpty(filterModel.SuccessMetricsQuery))
+                //    tests.Where(f=>f.SuccessMetrics.Contains(filterModel.SuccessMetricsQuery));
+
+                if (!string.IsNullOrEmpty(filterModel.QuarterQuery))
+                   tests = tests.Where(f=>f.Quarter.Contains(filterModel.QuarterQuery));
+
+                if (!string.IsNullOrEmpty(filterModel.YearQuery))
+                    tests = tests.Where(f => f.Year.ToString().Contains(filterModel.YearQuery));
+
+                if (!string.IsNullOrEmpty(filterModel.RankQuery))
+                    tests = tests.Where(f => (f.LevelOfBudget+f.LevelOfEffortToImplement+f.LevelOfEffortToReportOn+f.LevelOfImpact).ToString().Contains(filterModel.QuarterQuery));
+               
+
+                var finalTests =tests.Select( t => new TestModel()
+                             {
+                                 TestId = t.TestId,
+                                 ClientId = t.ClientId,
+                                 Name = t.Name,
+                                 SubmittedOn = t.SubmittedOn,
+                                 SubmittedBy = t.SubmittedBy,
+                                 Hypothesis = t.Hypothesis,
+                                 AdditionalNotes = t.AdditionalNotes,
+                                 ExpectedBusinessValue = t.ExpectedBusinessValue,
+                                 Quarter = t.Quarter,
+                                 Year = t.Year,
+                                 Status = t.TestStatu.Name,
+                                 StartDate = t.StartDate,
+                                 EndDate = t.EndDate,
+                                 Outcome = t.Outcome,
+                                 Recommendation = t.Recommendation,
+                                 LevelOfEffortToImplement = t.LevelOfEffortToImplement,
+                                 LevelOfEffortToReportOn = t.LevelOfEffortToReportOn,
+                                 LevelOfBudget = t.LevelOfBudget,
+                                 LevelOfImpact = t.LevelOfImpact,
+                                 TestTypes = (from tt in t.TestTypes select new TestTypeModel() { TestTypeId = tt.TestTypeId, Name = tt.Name }).ToList(),
+                                 SuccessMetric = t.SuccessMetricId.HasValue ?
+                                 new SuccessMetricModel()
+                                 {
+                                     SuccessMetricId = t.SuccessMetricId,
+                                     Name = t.SuccessMetric.Name
+                                 }
+                                 :
+                                 null,
+                                 Pillar = (t.PillarId.HasValue) ?
+                                 new PillarModel()
+                                 {
+                                     PillarId = t.PillarId,
+                                     Name = t.Pillar.Name
+                                 }
+                                 :
+                                 null
+                             }).ToList();
+
+
+                return finalTests;
+            }
+
+            throw new Exception("Not Implemented yet");
+        }
+
+        public IList<SuccessMetricModel> GetSuccessMetrics(int clientId)
+        {
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                var successMetrics = (from sm in connection.Clients.Single(f => f.ClientId == clientId).SuccessMetrics
+                                     select new SuccessMetricModel()
+                                     {
+                                         SuccessMetricId = sm.SuccessMetricId,
+                                         Name = sm.Name
+                                     }).ToList();
+
+                return successMetrics;
+            }
+        }
+
+        public IList<TestTypeModel> GetTestTypes(int clientId)
+        {
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                var testTypes = (from tt in connection.Clients.Single(f => f.ClientId == clientId).TestTypes
+                                 select new TestTypeModel()
+                                 {
+                                     TestTypeId = tt.TestTypeId,
+                                     Name = tt.Name
+                                 }).ToList();
+
+                return testTypes;
+            }
+        }
+
+        public IList<PillarModel> GetPillars(int clientId)
+        {
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                var x = (from p in connection.Clients.Single(f => f.ClientId == clientId).Pillars
+                                 select new PillarModel()
+                                 {
+                                     PillarId = p.PillarId,
+                                     Name = p.Name
+                                 }).ToList();
+
+                return x;
+            }
+        }
+
+        public void ChangeStatus(int testId, int testStatusId)
+        {
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                var test = connection.Tests.Single(f => f.TestId == testId);
+                test.TestStatusId = testStatusId;
+
+                connection.SaveChanges();
+            }
+        }
+
+        public void CloseTest(TestOutcomeModel outcomeModel)
+        {
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                var test = connection.Tests.Single(f => f.TestId == outcomeModel.TestId);
+                var closeStatus = connection.TestStatus.Single(f => f.Name.Trim().ToLower() == "closed");
+
+                test.TestStatusId = closeStatus.TestStatusId;
+                test.Outcome = outcomeModel.Outcome;
+                test.Recommendation = outcomeModel.Recommendation;
+
+                connection.SaveChanges();
+            }
+        }
+
+        public void RankTest(TestRankModel rank)
+        {
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                var test = connection.Tests.Single(t => t.TestId == rank.TestId);
+
+                test.LevelOfEffortToImplement = rank.LevelOfEffortToImplement;
+                test.LevelOfEffortToReportOn = rank.LevelOfEffortToReportOn;
+                test.LevelOfImpact = rank.LevelOfImpact;
+                test.LevelOfBudget = rank.LevelOfBudget;
+
+                //calculate 
+
+                connection.SaveChanges();
+            }
+        }
+
+        public int GetRank(int TestId)
+        {
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                var test = connection.Tests.Single(t => t.TestId == TestId);
+                return ((int)test.LevelOfEffortToImplement + (int)test.LevelOfEffortToReportOn + (int)test.LevelOfImpact + (int)test.LevelOfBudget);
+            }
+        }
+
+        public void SubmitRunDates(TestRunDatesModel model)
+        {
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                var test = connection.Tests.Single(f => f.TestId == model.TestId);
+                test.StartDate = model.StartDate;
+                test.EndDate = model.EndDate;
+
+                connection.SaveChanges();
+            }
+        }
+
+        static Expression<Func<TElement, bool>> BuildContainsExpression<TElement, TValue>(Expression<Func<TElement, TValue>> valueSelector, IEnumerable<TValue> values)
+        {
+            if (null == valueSelector) { throw new ArgumentNullException("valueSelector"); }
+            if (null == values) { throw new ArgumentNullException("values"); }
+            ParameterExpression p = valueSelector.Parameters.Single();
+            // p => valueSelector(p) == values[0] || valueSelector(p) == ...
+            if (!values.Any())
+            {
+                return e => false;
+            }
+            var equals = values.Select(value => (Expression)Expression.Equal(valueSelector.Body, Expression.Constant(value, typeof(TValue))));
+            var body = equals.Aggregate<Expression>((accumulate, equal) => Expression.Or(accumulate, equal));
+            return Expression.Lambda<Func<TElement, bool>>(body, p);
+        }
+
+        public void DeleteTest(int TestId)
+        { 
+        using(var connection = new TestAndLearnEntitiesConnection()){
+            //connection.TestTypes
+            Test t = connection.Tests
+                .Include("TestTypes")
+                .SingleOrDefault(tt => tt.TestId==TestId);
+
+            //foreach (var tt in t.TestTypes)
+            //{
+            //    t.TestTypes.Remove(tt);
+            //}
+
+            for (int i = t.TestTypes.Count - 1; i >= 0; i--)
+            {
+                var tt = t.TestTypes.ElementAt(i);
+                t.TestTypes.Remove(tt);
+            }
+                 
+                connection.Tests.Remove(t);
+            connection.SaveChanges();        
+        };
+        
+        }
+
+        public void addUrls(TestUrlModel urls)
+        { 
+        using(var connection = new TestAndLearnEntitiesConnection()){
+           
+            String s;
+
+           if (!string.IsNullOrEmpty(urls.Url1))
+          {
+                TestUrl url1 = new TestUrl() {TestId = urls.TestId, Url = urls.Url1 };  
+                connection.TestUrls.Add(url1);
+
+            }
+
+           if (!string.IsNullOrEmpty(urls.Url2))
+            {
+                TestUrl url2 = new TestUrl() { TestId = urls.TestId, Url = urls.Url2 };
+                connection.TestUrls.Add(url2);
+
+            }
+
+           if (!string.IsNullOrEmpty(urls.Url3))
+            {
+                TestUrl url3 = new TestUrl() { TestId = urls.TestId, Url = urls.Url3};
+                connection.TestUrls.Add(url3);
+
+            }
+
+           if (!string.IsNullOrEmpty(urls.Url4))
+            {
+                TestUrl url4 = new TestUrl() { TestId = urls.TestId, Url = urls.Url4};
+                connection.TestUrls.Add(url4);
+
+            }
+
+           if (!string.IsNullOrEmpty(urls.Url5))
+            {
+                TestUrl url5 = new TestUrl() { TestId = urls.TestId, Url = urls.Url5 };
+                connection.TestUrls.Add(url5);
+            }
+
+           if (!string.IsNullOrEmpty(urls.Url6))
+            {
+                TestUrl url6 = new TestUrl() { TestId = urls.TestId, Url = urls.Url6 };
+                connection.TestUrls.Add(url6);
+            }
+
+           connection.Database.ExecuteSqlCommand("DELETE FROM TestUrl WHERE TestId = @TestId", new SqlParameter("@TestId", urls.TestId));
+            
+                connection.SaveChanges();
+  
+        };
+
+        }
+
+       
+        public TestUrlModel GetUrls(int TestId)
+        {
+
+            using(var connection = new TestAndLearnEntitiesConnection()){
+
+                var testName = (from t in connection.Tests
+                                where t.TestId == TestId
+                                select t.Name).SingleOrDefault();
+
+                var urlList = (from u in connection.TestUrls
+                                where u.TestId == TestId
+                                select new UrlDBModel() { 
+                                TestId=u.TestId,
+                                 Url = u.Url,
+                                }
+                                    ).ToList();
+
+                int count = urlList.Count();
+                TestUrlModel urlmodel = new TestUrlModel();
+                
+                urlmodel.TestName = testName;
+                urlmodel.TestId = TestId;
+                if (count >= 1)
+                    urlmodel.Url1 = urlList.ElementAt(0).Url;
+                if (count >= 2)
+                    urlmodel.Url2 = urlList.ElementAt(1).Url;
+                if (count >= 3)
+                    urlmodel.Url3 = urlList.ElementAt(2).Url;
+                if (count >= 4)
+                    urlmodel.Url4 = urlList.ElementAt(3).Url;
+                if (count >= 5)
+                    urlmodel.Url5 = urlList.ElementAt(4).Url;
+                if (count >= 6)
+                    urlmodel.Url6 = urlList.ElementAt(5).Url;
+                
+                return urlmodel;
+            
+            
+            };
+            
+          
+
+        }
+
+    }
+}

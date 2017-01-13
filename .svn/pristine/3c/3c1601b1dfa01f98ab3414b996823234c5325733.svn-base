@@ -1,0 +1,79 @@
+﻿@model TestAndLearn.Domain.Models.UserModel
+@using TestAndLearn.Web.Extensions
+
+@{
+    ViewBag.Title = "Calendar";
+    ViewBag.ActiveSection = "Calendar";
+    Layout = "~/Views/Layouts/_Master.cshtml";
+}
+<html>
+<body>
+        <div class="row">
+            <img src="@Url.Content("~/Images/ClientLogos/" + Model.Clients.Single(f => f.ClientId == Model.UserSettings.SelectedClientId).LogoImageName)" />
+        </div>
+
+
+        <div id="calendar">
+
+        </div><br />
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div style="width: 20px; height: 20px; border: 1px solid #337ab7; background-color: #337ab7;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Events</div>&nbsp; &nbsp; &nbsp;
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div style="width: 20px; height: 20px; border: 1px solid #7b4173; background-color: #7b4173; ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tests(Mobile)</div>&nbsp; &nbsp; &nbsp;
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div style="width: 20px; height: 20px; border: 1px solid #a55194; background-color: #a55194; ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tests(Content)</div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div style="width: 20px; height: 20px; border: 1px solid #ce6dbd; background-color: #ce6dbd; ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tests(ECommerce)</div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div style="width: 20px; height: 20px; border: 1px solid #de9ed6; background-color: #de9ed6; ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tests(Landing Pages)</div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div style="width: 20px; height: 20px; border: 1px solid #7f7f7f; background-color: #7f7f7f; ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tests</div>
+                </div>
+            </div>
+        </div>
+
+</body>
+</html>
+
+@section MoreScripts {
+    
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Home/Calendar.js")"></script>
+    <script type="text/javascript">
+        $(function () {
+            TestAndLearn.Home.Calendar.init({
+                clientId: @Model.UserSettings.SelectedClientId,
+                getTestsEventsUrl : '@Url.Action("GetCalendarData", "api/CalendarApi")'                  
+            });
+        });
+
+    </script>
+    
+} 
+
+@section PartialsWithScripts {
+    @Html.Partial("EventForm", Model.UserSettings.SelectedClientId);
+
+    @{
+    Html.RenderAction("TestForm", "Home", new { id = Model.UserSettings.SelectedClientId });
+     }
+
+    @if (Model.Role == "Admin")
+    {
+        @Html.Partial("RunDatesForm")
+
+    }
+}

@@ -1,0 +1,47 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using TestAndLearn.Domain;
+using TestAndLearn.Domain.Models;
+
+namespace TestAndLearn.Web.Controllers
+{
+    public class TestApiController : BaseApiController
+    {
+        private ITestRepository _testRepository;
+
+        public TestApiController(ITestRepository testRepository)
+        {
+            _testRepository = testRepository;
+        }
+
+        public IList<TestTypeModel> GetTestTypes(int clientId)
+        {
+            return _testRepository.GetTestTypes(clientId);
+        }
+
+        public IList<SuccessMetricModel> GetSuccessMetrics(int clientId)
+        {
+            return _testRepository.GetSuccessMetrics(clientId);
+        }
+
+        public IList<TestModel> GetTests(int clientId)
+        {
+            return _testRepository.GetTests(clientId);
+        }
+
+        public TestModel GetTest(int id)
+        {
+            return _testRepository.GetTest(id);
+        }
+
+        //save test
+
+        //approve test
+
+        //close test
+    }
+}

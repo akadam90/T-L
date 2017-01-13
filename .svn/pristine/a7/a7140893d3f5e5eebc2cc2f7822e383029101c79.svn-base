@@ -1,0 +1,31 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using TestAndLearn.Web.Models;
+
+namespace TestAndLearn.Web.Controllers
+{
+    public class HomeController : BaseController
+    {
+        public ActionResult Index()
+        {
+            return View(new UserProfileModel() 
+            {
+                IsAdmin = true,
+                Username = this.User.Identity.Name,
+                Email = "todo@notready.net",
+                ClientId = 1,
+                ClientName = "USCC"
+            });
+        }
+
+        public ActionResult ChangeTheme(string theme)
+        {
+            Session["ActiveTheme"] = theme;
+
+            return RedirectToAction("Index");
+        }
+	}
+}

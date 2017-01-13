@@ -1,0 +1,56 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TestAndLearn.Domain.Models
+{
+    public class TestModel
+    {
+        public int TestId { get; set; }
+
+        public int ClientId { get; set; }
+
+        public string Name { get; set; }
+        public string SubmittedBy { get; set; }
+        public DateTime SubmittedOn { get; set; }
+
+        public IList<SuccessMetricModel> SuccessMetrics { get; set; }
+        public IList<TestTypeModel> TestTypes { get; set; }
+
+        public string Hypothesis { get; set; }
+        public string AdditionalNotes { get; set; }
+
+        public string ExpectedBusinessValue { get; set; }
+
+        public string Quarter { get; set; }
+        public int? Year { get; set; }
+
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+
+        public string Outcome { get; set; }
+        public string Recommendation { get; set; }
+
+        public string Status { get; set; }
+
+        public int? LevelOfEffortToImplement { get; set; }
+        public int? LevelOfEffortToReportOn { get; set; }
+        public int? LevelOfBudget { get; set; }
+        public int? LevelOfImpact { get; set; }
+
+        public int Rank
+        {
+            get
+            {
+                var w = this.LevelOfEffortToImplement.HasValue ? this.LevelOfEffortToImplement.Value : 0;
+                var x = this.LevelOfEffortToReportOn.HasValue ? this.LevelOfEffortToReportOn.Value : 0;
+                var y = this.LevelOfBudget.HasValue ? this.LevelOfBudget.Value : 0;
+                var z = this.LevelOfImpact.HasValue ? this.LevelOfImpact.Value : 0;
+
+                return w + x + y + z;
+            }
+        }
+    }
+}

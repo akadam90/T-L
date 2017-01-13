@@ -1,0 +1,40 @@
+﻿@model TestAndLearn.Web.Models.RegisterUserModels
+
+@{
+    ViewBag.Title = "User Acccounts";
+    ViewBag.ActiveSection = "Accounts";
+    Layout = "~/Views/Layouts/_Master.cshtml";
+}
+
+<h2 class="row">User Accounts</h2>
+
+<div class="row">
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".save-starcom-user-modal">New Starcom User</button>
+    <button type="button" class="btn btn-default" data-toggle="modal" data-target=".save-client-user-modal">New Client User</button>
+</div>
+
+<div class="ux-grid-wrapper">
+    <table id="user-grid"></table>
+</div>
+
+@{
+    Html.RenderPartial("_StarcomUserForm", Model.PublicisUserModel);
+}
+
+@{
+    Html.RenderPartial("_ClientUserForm", Model.ClientUserModel);
+}
+
+@section MoreScripts {
+    <script src="@Url.Content("~/Scripts/Account/UserControls.js")" type="text/javascript"></script>
+
+    <script>
+            $(function () {
+                TestAndLearn.Account.UserControls.init({
+                    getUsersUrl: '@Url.Action("GetUsers", "Account")',
+                    deleteUserUrl: '@Url.Action("DeleteUser", "Account")',
+                    searchPublicisUsersUrl: '@Url.Action("SearchPublicisUsers", "Account")'
+                });
+            });
+    </script>
+}

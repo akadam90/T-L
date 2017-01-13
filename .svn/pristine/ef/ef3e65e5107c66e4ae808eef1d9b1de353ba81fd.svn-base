@@ -1,0 +1,590 @@
+﻿if (typeof (TestAndLearn) == 'undefined') {
+    var TestAndLearn = {};
+}
+
+if (typeof(TestAndLearn.Home) == 'undefined') {
+    TestAndLearn.Home = {};
+}
+
+var debug = {};
+
+TestAndLearn.Home.Grids = (function () {
+    var _config;
+    var _offsetHeight = 280;
+
+    var _sharedColNames = [
+        'Id',
+        '',
+        'Submitted On',
+        'Test Name',
+        'Submitted By',
+        'Test Type(s)',
+        'Success Metric',
+        'Pillar', 'Qtr',
+        'Year', 'Rank',
+        'Hypothesis',
+        'Additional Notes',
+        'Expected Business Value'
+    ];
+
+    var _sharedColModel = [
+                     {
+                         name: 'TestId',
+                         index: 'TestId',
+                         hidden: true
+                     },
+                    {
+                        name: '',
+                        index: '',
+                        width: 40,
+                        fixed: true,
+                        search: false,
+                        searchoptions: {
+                            clearSearch: false
+                        },
+                        align: 'center',
+                        formatter: function (cellvalue, options, obj) {
+                            var optionsS = [
+                                '<button type="button" class="options-btn options-cell" id="options-cell-' + obj.TestId + '">',
+                                    '<span></span>',
+                                    '<span></span>',
+                                    '<span></span>',
+                                '</button>'
+                            ].join('');
+
+                            return optionsS;
+                        }
+                    }, {
+                        name: 'SubmittedOn',
+                        index: 'SubmittedOn',
+                        sorttype: "date",
+                        datefmt: 'd/m/Y',
+                        search: true,
+                        searchoptions: {
+                            clearSearch: false,
+                            sopt: ['cn']
+                        },
+                        stype: 'text',
+                        width: 80,
+                        fixed: true
+                    },
+                    {
+                        name: 'Name',
+                        index: 'Name',
+                        sorttype: "string",
+                        search: true,
+                        searchoptions: {
+                            clearSearch: false,
+                            sopt: ['cn']
+                        },
+                        stype: 'text'
+                    },
+                    {
+                        name: 'SubmittedBy',
+                        index: 'SubmittedBy',
+                        sorttype: "text",
+                        search: true,
+                        searchoptions: {
+                            clearSearch: false,
+                            sopt: ['cn']
+                        },
+                        stype: 'text',
+                        width: 250,
+                        fixed: true
+                    },
+                    {
+                        name: 'TestTypesAsString',
+                        index: 'TestTypesAsString',
+                        width: 200,
+                        fixed: true,
+                        search: true,
+                        stype: 'text',
+                        searchoptions: { 
+                            clearSearch: false,
+                            sopt: ['cn']
+                        }
+                    },
+                    {
+                        name: 'SuccessMetric.Name',
+                        hidden: true /*,
+                        width: 100,
+                        fixed: true,
+                        sorttype: "string",
+                        search: true,
+                        searchoptions: {
+                            clearSearch: false,
+                            sopt: ['cn']
+                        },
+                        stype: 'text'
+                        */
+                    },
+                    {
+                        name: 'Pillar.Name',
+                        index: 'Pillar.Name',
+                        width: 100,
+                        fixed: true,
+                        sorttype: "string",
+                        search: true,
+                        searchoptions: {
+                            clearSearch: false,
+                            sopt: ['cn']
+                        },
+                        stype: 'text'
+                    },
+                    {
+                        name: 'Quarter',
+                        index: 'Quarter',
+                        sorttype: "string",
+                        search: true,
+                        searchoptions: {
+                            clearSearch: false,
+                            sopt: ['cn']
+                        },
+                        stype: 'text',
+                        width: 60,
+                        fixed: true,
+                        align: 'center'
+                    },
+                    {
+                        name: 'Year',
+                        index: 'Year',
+                        sorttype: 'int',
+                        search: true,
+                        searchoptions: {
+                            clearSearch: false,
+                            sopt: ['eq']
+                        },
+                        stype: 'text',
+                        width: 50,
+                        fixed: true,
+                        align: 'center'
+                    },
+                    {
+                        name: 'Rank',
+                        index: 'Rank',
+                        sorttype: "number",
+                        search: true,
+                        stype: 'text',
+                        searchoptions: {
+                            clearSearch: false,
+                            sopt: ['ge']
+                        },
+                        width: 50,
+                        fixed: true,
+                        align: 'center'
+                    },
+                    {
+                        name: 'Hypothesis',
+                        index: 'Hypothesis',
+                        hidden: true
+                    },
+                    {
+                        name: 'AdditionalNotes',
+                        index: 'AdditionalNotes',
+                        hidden: true
+                    },
+                    {
+                        name: 'ExpectedBusinessValue',
+                        index: 'ExpectedBusinessValue',
+                        sorttype: "string",
+                        hidden: true
+                    }
+    ];
+
+    var _formatAdditionalContent = function (arr) {
+        var s = ['<div class="bs-callout bs-callout-info row" style="margin: 10px;">'];
+
+        for (var i = 0; i < arr.length; i++) {
+            s.push('<p><h4>' + arr[i].title + '</h4>');
+            s.push(arr[i].content + '</p><br/>');
+        }
+        s.push('</div>');
+
+        return s.join('');
+    }
+
+    return {
+        init: function (config) {
+            _config = config;
+
+            this.initSubmittedGrid();
+            this.initApprovedGrid();
+            this.initClosedGrid();
+
+            $('#download-tests-form').submit(function (e) {
+                var activeTab = $('#test-tab-panel li.active a').attr('href');
+
+                //var rows = [];
+                var filters = null
+                if (activeTab == '#submitted') {
+                    //rows = $('#submitted-test-grid').getRowData();
+                    filters = $('#submitted-test-grid').getGridParam("postData").filters;
+                    $('#input-download-tests-teststatusid').val(_config.submittedStatusId);
+                }
+                else if (activeTab == '#approved') {
+                    filters = $('#approved-test-grid').getGridParam("postData").filters;
+                    $('#input-download-tests-teststatusid').val(_config.approvedStatusId);
+                }
+                else if (activeTab == '#closed') {
+                    filters = $('#closed-test-grid').getGridParam("postData").filters;
+                    $('#input-download-tests-teststatusid').val(_config.closedStatusId);
+                }
+                e.preventDefault();
+                var f = $.parseJSON(filters);
+                debug.filtersString = filters;
+                debug.filtersJSON = f;
+
+                if (f != null) {
+                    for (var i = 0; i < f.rules.length; i++) {
+                        var fieldName = f.rules[i].field;
+                         $(this).find('input[name="' + fieldName + 'Query"]').val(f.rules[i].data);
+                    }
+                }
+            });
+        }
+
+        ,initSubmittedGrid: function () {
+            var colNames = _sharedColNames.slice();
+            var colModel = _sharedColModel.slice();
+
+            $('#submitted-test-grid').jqGrid({
+                //data: data,
+                url: _config.getTestsUrl,
+                postData: {
+                    clientId: _config.clientId,
+                    testStatusId: _config.submittedStatusId
+                },
+                datatype: "json",
+                mtype: 'GET',
+                autowidth: true,
+                height: $(document).height() - _offsetHeight,
+                colNames: colNames,
+                colModel: colModel,
+                scroll: true,
+                loadonce: true,
+                viewrecords: true,
+                /*When entire grid is loaded*/
+                loadComplete: function (data) {
+                    $(this).parent().children('div.empty-grid').first().remove();
+
+                    if (data.length == 0 || (typeof(data.rows) != 'undefined' && data.rows.length == 0)) {
+                        $(this).parent().append([
+                            '<div class="empty-grid bs-callout bs-callout-warning row">',
+                            '<h4>No Tests</h4>',
+                            '<p>',
+                                'There are no tests of the selected status and filter.',
+                            '</p>',
+                            '</div>'].join(''));
+                    }
+                    else {
+                        $('#submitted-test-grid .options-cell').unbind('click');
+                        $('#submitted-test-grid .options-cell').click(function (e) {
+                            var id = $(this).attr('id').replace('options-cell-', '');
+                            
+                            JQueryUX.PopUpMenu.show(e, {
+                                menuName: 'test-row-menu-',
+                                items: [
+                                      {
+                                          name: 'Edit Test',
+                                          onClick: function () {
+                                              TestAndLearn.Home.TestForm.editTest(id);
+                                          }
+                                      }, {
+                                          name: 'Rank Test',
+                                          onClick: function () {
+                                              TestAndLearn.Home.RankForm.editRank(id);
+                                          }
+                                      }
+                                ],
+                                jqElementClickedOn: $(this)
+                            });
+                        });
+                    }
+                },
+                subGrid: true,
+                subGridRowExpanded: function (subgrid_id, row_id) {
+                    var row = $(this).getRowData(row_id);
+                    debug.Row = row;
+					var s = _formatAdditionalContent([
+                        {
+                            title: 'Success Metric',
+                            content: row['SuccessMetric.Name']
+                        },{
+                            title: 'Hypothesis',
+                            content: row.Hypothesis
+                        }, {
+                            title: 'Additional Notes',
+                            content: row.AdditionalNotes
+                        }, {
+                            title: 'Expected Business Value',
+                            content: row.ExpectedBusinessValue
+                        }
+                    ]);
+
+                    $('#' + subgrid_id).html(s);
+                },
+                subGridRowColapsed: function (subgrid_id, row_id) {
+                    
+                }
+            });
+
+            $('#submitted-test-grid').jqGrid('filterToolbar', {
+                stringResult: false,
+                searchOnEnter: false,
+                defaultSearch: 'cn'
+            });
+        }
+
+        ,initApprovedGrid: function () {
+            var colNames = _sharedColNames.slice();
+
+            colNames.push('Start Date');
+            colNames.push('End Date');
+            var colModel = _sharedColModel.slice();
+            
+            colModel.push({
+                name: 'StartDate',
+                index: 'StartDate',
+                sorttype: "date",
+                datefmt: 'd/m/Y',
+                search: true,
+                searchoptions: {
+                    clearSearch: false,
+                    sopt: ['cn']
+                },
+                stype: 'text',
+                width: 80,
+                fixed: true
+            });
+
+            colModel.push({
+                name: 'EndDate',
+                index: 'EndDate',
+                sorttype: "date",
+                datefmt: 'd/m/Y',
+                search: true,
+                searchoptions: {
+                    clearSearch: false,
+                    sopt: ['cn']
+                },
+                stype: 'text',
+                width: 80,
+                fixed: true
+            });
+
+            $('#approved-test-grid').jqGrid({
+                //data: data,
+                url: _config.getTestsUrl,
+                postData: {
+                    clientId: _config.clientId,
+                    testStatusId: _config.approvedStatusId
+                },
+                datatype: "json",
+                mtype: 'GET',
+                autowidth: true,
+                height: $(document).height() - _offsetHeight,
+                colNames: colNames,
+                colModel: colModel,
+                scroll: true,
+                loadonce: true,
+                viewrecords: true,
+                loadComplete: function (data) {
+                    $(this).parent().children('div.empty-grid').first().remove();
+
+                    if (data.length == 0 || (typeof (data.rows) != 'undefined' && data.rows.length == 0)) {
+                        $(this).parent().append([
+                            '<div class="empty-grid bs-callout bs-callout-warning row">',
+                            '<h4>No Tests</h4>',
+                            '<p>',
+                                'There are no approved tests matching the selceted filters.',
+                            '</p>',
+                            '</div>'].join(''));
+
+                    }
+                    else {
+
+                    }
+                },
+                subGrid: true,
+                subGridRowExpanded: function (subgrid_id, row_id) {
+                    var row = $(this).getRowData(row_id);
+
+                    var s = _formatAdditionalContent([
+                        {
+                            title: 'Success Metric',
+                            content: row['SuccessMetric.Name']
+                        },{
+                            title: 'Hypothesis',
+                            content: row.Hypothesis
+                        }, {
+                            title: 'Additional Notes',
+                            content: row.AdditionalNotes
+                        }, {
+                            title: 'Expected Business Value',
+                            content: row.ExpectedBusinessValue
+                        }
+                    ]);
+
+                    $('#' + subgrid_id).html(s);
+                },
+                subGridRowColapsed: function (subgrid_id, row_id) {
+                    
+                }
+            });
+
+            $('#approved-test-grid').jqGrid('filterToolbar', {
+                stringResult: false,
+                searchOnEnter: false
+            });
+        }
+
+        ,initClosedGrid: function () {
+            var colNames = _sharedColNames.slice();
+            colNames.push('Start Date');
+            colNames.push('End Date');
+            colNames.push('Outcome');
+            colNames.push('Recommendation');
+
+            var colModel = _sharedColModel.slice();
+
+            colModel.push({
+                name: 'StartDate',
+                index: 'StartDate',
+                sorttype: "date",
+                datefmt: 'd/m/Y',
+                search: true,
+                searchoptions: {
+                    clearSearch: false,
+                    sopt: ['cn']
+                },
+                stype: 'text',
+                width: 80,
+                fixed: true
+            });
+
+            colModel.push({
+                name: 'EndDate',
+                index: 'EndDate',
+                sorttype: "date",
+                datefmt: 'd/m/Y',
+                search: true,
+                searchoptions: {
+                    clearSearch: false,
+                    sopt: ['cn']
+                },
+                stype: 'text',
+                width: 80,
+                fixed: true
+            });
+            colModel.push({ name: 'Outcome', index: 'Outcome', hidden: true });
+            colModel.push({ name: 'Recommendation', index: 'Recommendation', hidden: true });
+
+            $('#closed-test-grid').jqGrid({
+                //data: data,
+                url: _config.getTestsUrl,
+                postData: {
+                    clientId: _config.clientId,
+                    testStatusId: _config.closedStatusId
+                },
+                datatype: "json",
+                mtype: 'GET',
+                autowidth: true,
+                height: $(document).height() - _offsetHeight,
+                colNames: colNames,
+                colModel: colModel,
+                scroll: true,
+                loadonce: true,
+                viewrecords: true,
+                loadComplete: function (data) {
+                    $(this).parent().children('div.empty-grid').first().remove();
+
+                    if (data.length == 0 || (typeof (data.rows) != 'undefined' && data.rows.length == 0)) {
+                        $(this).parent().append([
+                            '<div class="empty-grid bs-callout bs-callout-warning row">',
+                            '<h4>No Tests</h4>',
+                            '<p>',
+                                'There are no closed tests matching the selected filters.',
+                            '</p>',
+                            '</div>'].join(''));
+
+                    }
+                    else {
+                        
+                    }
+                },
+                subGrid: true,
+                subGridRowExpanded: function (subgrid_id, row_id) {
+                    var row = $(this).getRowData(row_id);
+
+                    var s = _formatAdditionalContent([
+                        {
+                            title: 'Success Metric',
+                            content: row['SuccessMetric.Name']
+                        }, {
+                            title: 'Hypothesis',
+                            content: row.Hypothesis
+                        }, {
+                            title: 'Additional Notes',
+                            content: row.AdditionalNotes
+                        }, {
+                            title: 'Expected Business Value',
+                            content: row.ExpectedBusinessValue
+                        }, {
+                            title: 'Outcome',
+                            content: row.Outcome
+                        }, {
+                            title: 'Recommendation',
+                            content: row.Recommendation
+                        }
+                    ]);
+
+                    $('#' + subgrid_id).html(s);
+                },
+                subGridRowColapsed: function (subgrid_id, row_id) {
+                    
+                }
+            });
+
+            $('#closed-test-grid').jqGrid('filterToolbar', {
+                stringResult: false,
+                searchOnEnter: false
+            });
+        }
+
+        , reloadAll: function () {
+            $('#submitted-test-grid').jqGrid('setGridParam', { datatype: 'json' }).trigger('reloadGrid');
+            $('#approved-test-grid').jqGrid('setGridParam', { datatype: 'json' }).trigger('reloadGrid');
+            $('#closed-test-grid').jqGrid('setGridParam', { datatype: 'json' }).trigger('reloadGrid');
+        }
+
+        , changeTestStatus: function (testId, statusId) {
+            $.ajax({
+                url: _config.changeTestStatusUrl,
+                type: 'GET',
+                data: {
+                    testId: testId,
+                    statusId: statusId
+                },
+                success: function (response) {
+                    if (response.Success == true) {
+                        JQueryUX.Msg.SlideIn({
+                            width: 200,
+                            height: 50,
+                            msg: 'Test Status Changed',
+                            dockAt: 'tc',
+                            wrapperWidthOffset: 8,
+                            wrapperHeightOffset: 8
+                        });
+                        _reloadAllGrids();
+                    }
+                    else {
+                        alert(response.Message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert(error);
+                }
+            });
+        }
+    };
+})();

@@ -1,0 +1,5 @@
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain\bin\Release\TestAndLearn.Domain.dll
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain\bin\Release\TestAndLearn.Domain.pdb
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain\obj\Release\TestAndLearn.Domain.csprojResolveAssemblyReference.cache
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain\obj\Release\TestAndLearn.Domain.dll
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain\obj\Release\TestAndLearn.Domain.pdb

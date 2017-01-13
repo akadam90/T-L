@@ -1,0 +1,48 @@
+﻿@using TestAndLearn.Web.Extensions
+
+<div class="modal fade" id="close-test-modal" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Close Test</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="close-test-form" action="@Url.Action("CloseTest", "api/TestApi")" method="POST">
+                    <input type="hidden" id="input-close-test-testid" name="TestId" />
+                    <h4 id="input-closeTestName" style="color:#337ab7; text-align:center"></h4><br />
+
+                    <div class="form-group">
+                        <label for="input-test-outcome" class="col-sm-4 control-label">Outcome</label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control" id="input-close-test-outcome" name="Outcome" placeholder="Outcome" rows="5"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-test-recommendation" class="col-sm-4 control-label">Recommendation</label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control" id="input-close-test-recommendation" name="Recommendation" placeholder="Recommendation" rows="5" style="text-align:left"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript" src="@Url.ContentNoCaching("~/Scripts/Home/CloseForm.js")"></script>
+<script type="text/javascript">
+    $(function () {
+        TestAndLearn.Home.CloseForm.init({
+            getTestUrl: '@Url.Action("GetTest", "api/TestApi")'
+        });
+    });
+</script>
+

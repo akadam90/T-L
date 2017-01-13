@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>@ViewBag.Title</title>
+    <link href="@Url.Content("~/Content/jquery/themes/base/minified/jquery-ui.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/jquery/jquery.loadmask.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/jquery/jquery-ui.override.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/jquery/ui.jqgrid.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/jquery/ui.jqgrid-override.css")" rel="stylesheet" />
+
+    <link href="@Url.Content("~/Content/bootstrap/bootstrap.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/bootstrap/bootstrap-" + Session["ActiveTheme"] + "-theme.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/bootstrap/bootstrap-callout.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/bootstrap/bootstrap-slider.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/bootstrap/bootstrap-datepicker.min.css")" rel="stylesheet" />
+    
+    <style>
+        body 
+        {
+            padding-top: 50px;
+        }
+
+        .row {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+   
+    @RenderSection("MoreStyles", false)
+</head>
+<body>
+    @{
+        Html.RenderAction("MainNavigation", "Shared", new { activeSection = ViewBag.ActiveSection });
+    }
+
+    <div class="container" style="width: 99%">
+        @RenderBody()
+    </div>
+
+    <!-- Place all script references just before the body closes-->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/jquery-1.10.2.min.js")"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/bootstrap/bootstrap.min.js")"></script>
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/jquery-ui.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/jquery.form.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/jquery.json-2.2.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/jquery.loadmask.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/jquery.jqGrid.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/grid.locale-en.js")"></script>
+
+    <!--
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Shared/main-navigation.js")"></script>
+    -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/bootstrap/bootstrap-datepicker.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/bootstrap/bootstrap-slider.js")"></script>
+
+    @RenderSection("MoreScripts", false)
+</body>
+</html>

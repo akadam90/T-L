@@ -1,0 +1,131 @@
+﻿/* --------------------------------------------------------------
+	[load mask]
+-------------------------------------------------------------- */
+.loadmask 
+{
+	background-color: #EBEBEB;
+}
+.loadmask-msg  
+{
+	background-color: #E8E8E8;
+	border-color: #606060;
+}
+.loadmask-msg div 
+{
+	background: white url("../../Images/ajax-loader.gif") no-repeat scroll 5px 5px;
+	color: #606060;
+	border: none;
+}
+
+/* ----------------------------------------------
+    [Slide in Message]
+---------------------------------------------- */
+.slide-in-msg {
+	border: 1px solid #aaaaaa;
+	background-color: white;
+}
+
+.slide-in-msg p 
+{
+    text-align: center;
+	padding: 5px;
+    color: #0066FF;
+}
+
+/* -----------------------------------------------------------
+ * 	[Search Box]
+ * -------------------------------------------------------- */
+.search-box {
+	background-image: url('../../Images/search_icon.png') !important; 
+	background-position: center right;
+	background-repeat: no-repeat;
+}
+
+input.ui-autocomplete-loading {
+	background-image: url('../../Images/ajax-loader.gif') !important;
+}
+
+.ui-autocomplete {
+    z-index: 10000;
+}
+
+/* --------------------------------------------
+	[Pop Up Menu]
+-------------------------------------------- */
+.pop-up-menu {
+    position: absolute;
+    z-index: 1;
+    background-color: white;
+    border: 1px solid #555555;
+    padding: 4px;
+    box-shadow: 5px 5px 5px #888888;
+}
+
+.pop-up-menu ul {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.pop-up-menu ul li {
+    padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.pop-up-menu-short {
+    z-index: 2;
+    border-top: 1px solid white;
+}
+
+.pop-up-menu-item {
+    padding-left: 4px;
+    padding-right: 4px;
+}
+.pop-up-menu-item:hover {
+    background-color: #7ACC29;
+}
+
+.pop-up-menu-item:hover a {
+    color: white;
+}
+.pop-up-menu-item a {
+    color: #555555;
+    text-align: right;
+    text-decoration: none !important;
+}
+
+.pop-up-menu-opener, 
+a.pop-up-menu-opener {
+    border: 1px solid #555555 !important;
+    background-color: white !important;
+    border-bottom: 1px solid white !important;
+    position: relative;
+    z-index: 2;
+}
+
+.pop-up-menu-opener-long, 
+a.pop-up-menu-opener-long {
+    border-bottom: 1px solid #555555 !important;
+    z-index: 1;
+}
+
+dd.pop-up-menu-item {
+  margin-left: 2px  
+}
+
+.pop-up-menu dt {
+    color: #333;
+    font-weight: bold;
+    border-bottom: 1px solid #555555;
+    margin-bottom: 4px;
+    margin-top: 4px;
+
+}
+
+.pop-up-menu-link {
+    padding: 2px;
+    border: 1px solid transparent;
+    display: block;
+}
+
+

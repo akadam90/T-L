@@ -1,0 +1,28 @@
+﻿
+<div class="modal fade" id="DeleteTestModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="delete-test-form" action="@Url.Action("DeleteTest","api/TestApi")" method="post">
+                    <input type="hidden" id="delete-test-TestId" name="TestId" value="" />
+                    <p>Are you sure you want to delete this Test ?</p>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script type="text/javascript" src="@Url.Content("~/Scripts/Home/DeleteTestForm.js")"></script>
+<script type="text/javascript">
+    $(function () {
+        TestAndLearn.Home.DeleteTestForm.init({
+
+        });
+    });
+</script>

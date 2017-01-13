@@ -1,0 +1,58 @@
+﻿@model TestAndLearn.Domain.Models.UserModel
+@using TestAndLearn.Web.Extensions
+
+@{
+    ViewBag.Title = "Calendar";
+    ViewBag.ActiveSection = "Calendar";
+    Layout = "~/Views/Layouts/_Master.cshtml";
+}
+
+<div class="row">
+    <img src="@Url.Content("~/Images/ClientLogos/" + Model.Clients.Single(f => f.ClientId == Model.UserSettings.SelectedClientId).LogoImageName)" />
+</div>
+
+
+    <div id="calendar"> 
+    </div>
+
+@section MoreScripts{
+    
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Home/Calendar.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Home/EventForm.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Home/TestForm.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Home/RunDatesForm.js")"></script>
+    
+    <script type="text/javascript">
+        $(function () {
+            TestAndLearn.Home.Calendar.init({
+                clientId: @Model.UserSettings.SelectedClientId,
+                getTestsEventsUrl : '@Url.Action("GetCalendarData", "api/CalendarApi")'                  
+            });
+            TestAndLearn.Home.EventForm.init({
+                clientId: @Model.UserSettings.SelectedClientId,
+                EditEventUrl : '@Url.Action("EditEvent","api/EventApi")'
+            })
+
+        });
+
+    </script>
+    
+    } 
+
+@section PartialsWithScripts {
+    @Html.Partial("EventForm", Model.UserSettings.SelectedClientId);
+
+    @{
+    Html.RenderAction("TestForm", "Home", new { id = Model.UserSettings.SelectedClientId });
+     }
+
+@if (Model.Role == "Admin")
+{
+    @Html.Partial("RunDatesForm")
+
+}
+
+
+
+
+}

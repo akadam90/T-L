@@ -1,0 +1,127 @@
+﻿using Syncfusion.XlsIO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using TestAndLearn.Domain;
+using TestAndLearn.Domain.Models;
+using TestAndLearn.Web.Models;
+
+namespace TestAndLearn.Web.Controllers
+{
+    public class HomeController : BaseController
+    {
+        private IUserRepository _userRepository;
+        private ITestRepository _testRepository;
+
+        public HomeController(IUserRepository userRepository, ITestRepository testRepository) : base(userRepository)
+        {
+            _userRepository = userRepository;
+            _testRepository = testRepository;
+        }
+
+        [EnforcePasswordChangePolicy]
+        public ActionResult Index()
+        {
+            var user = _userRepository.GetUser(this.User.Identity.Name);
+            Session["ActiveTheme"] = user.UserSettings.SelectedTheme;
+
+            return View(user);
+        }
+
+        [EnforcePasswordChangePolicy]
+        public ActionResult Events()
+        {
+            var user = _userRepository.GetUser(this.User.Identity.Name);
+            Session["ActiveTheme"] = user.UserSettings.SelectedTheme;
+
+            return View(user);
+        }
+
+
+        public ActionResult TestForm(int id)
+        {
+            var testTypes = _testRepository.GetTestTypes(id);
+            var successMetrics = _testRepository.GetSuccessMetrics(id);
+            var user = _userRepository.GetUser(this.User.Identity.Name);
+            var pillars = _testRepository.GetPillars(id);
+
+            return View(new TestFormModel() 
+            {
+                ClientId = id,
+                SuggesstedSubmitter = user.Email,
+                TestTypes = testTypes,
+                SuccessMetrics = successMetrics,
+                Pillars = pillars
+            });
+        }
+
+        [HttpPost]
+        public ActionResult DownloadTests(FilterTestModel filterModel)
+        {
+            var tests = _testRepository.GetTests(filterModel);
+
+            using (ExcelEngine excelEngine = new ExcelEngine())
+            {
+                IApplication application = excelEngine.Excel;
+                application.DefaultVersion = ExcelVersion.Excel2007;
+                IWorkbook workbook = application.Workbooks.Create(1);
+                workbook.Version = ExcelVersion.Excel2007;
+
+                IWorksheet sheet = workbook.Worksheets[0];
+
+                //column headers
+                int row = 1;
+                int col = 0;
+                
+                sheet[row, ++col].Text = "Submitted On";
+                sheet[row, ++col].Text = "Name";
+                sheet[row, ++col].Text = "Submitted By";
+                sheet[row, ++col].Text = "Text Type(s)";
+                sheet[row, ++col].Text = "Success Metric";
+                sheet[row, ++col].Text = "Pillar";
+                sheet[row, ++col].Text = "Quarter";
+                sheet[row, ++col].Text = "Year";
+                sheet[row, ++col].Text = "Start Date";
+                sheet[row, ++col].Text = "End Date";
+                sheet[row, ++col].Text = "Rank";
+                sheet[row, ++col].Text = "Hypothesis";
+                sheet[row, ++col].Text = "Additional Notes";
+                sheet[row, ++col].Text = "Expected Business Value";
+                sheet[row, ++col].Text = "Outcome";
+                sheet[row, ++col].Text = "Recomemndation";
+                sheet[row, ++col].Text = "Status";
+
+                row++;
+                foreach (var test in tests)
+                {
+                    col = 0;
+                    sheet[row, ++col].DateTime = test.SubmittedOn;
+                    sheet[row, ++col].Value = test.Name;
+                    sheet[row, ++col].Value = test.SubmittedBy;
+                    sheet[row, ++col].Value = test.TestTypesAsString;
+                    sheet[row, ++col].Value = test.SuccessMetric != null ? test.SuccessMetric.Name : "";
+                    sheet[row, ++col].Value = test.Pillar != null ? test.Pillar.Name : "";
+                    sheet[row, ++col].Value = test.Quarter;
+                    sheet[row, ++col].Value = test.Year.HasValue ? test.Year.Value.ToString() : "";
+                    sheet[row, ++col].Value = test.StartDate.HasValue ? test.StartDate.Value.ToShortDateString() : "";
+                    sheet[row, ++col].Value = test.EndDate.HasValue ? test.EndDate.Value.ToShortDateString() : "";
+                    sheet[row, ++col].Number = test.Rank;
+                    sheet[row, ++col].Value = test.Hypothesis;
+                    sheet[row, ++col].Value = test.AdditionalNotes;
+                    sheet[row, ++col].Value = test.ExpectedBusinessValue;
+                    sheet[row, ++col].Value = test.Outcome;
+                    sheet[row, ++col].Value = test.Recommendation;
+                    sheet[row, ++col].Value = test.Status;
+
+                    row++;
+                }
+
+                workbook.SaveAs("TestAndLearn_Download.xlsx", this.HttpContext.ApplicationInstance.Response, ExcelDownloadType.PromptDialog);
+            }
+
+            return new EmptyResult();
+        }
+	}
+}

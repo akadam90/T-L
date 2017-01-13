@@ -1,0 +1,50 @@
+﻿if (typeof (TestAndLearn) == 'undefined') {
+    var TestAndLearn = {};
+}
+
+if (typeof (TestAndLearn.Home) == 'undefined') {
+    TestAndLearn.Home = {};
+}
+
+var debug = {};
+
+TestAndLearn.Home.Calendar = (function () {
+
+    var _config;
+
+    return {
+        init: function (config) {
+            _config = config;
+
+            $(document).ready(function () {
+
+                $('#calendar').fullCalendar({
+
+                    header: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'month,basicWeek,basicDay'
+                    },
+                    height: 750,
+                    editable: true,
+                    events: {
+                        url: _config.getTestsEventsUrl,
+                        type: 'GET',
+                        data: {
+                          client : _config.clientId    
+                        },
+                        error: function () {
+                            alert('there was an error while fetching events!');
+                        }
+                    }
+                
+                });
+
+            });
+
+        }
+
+    };
+
+
+})();

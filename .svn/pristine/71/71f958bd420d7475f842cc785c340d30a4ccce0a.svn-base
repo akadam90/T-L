@@ -1,0 +1,71 @@
+﻿<!-- Fixed navbar -->
+@model TestAndLearn.Web.Models.NavigationModel
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div>
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Test and Learn</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+
+            <ul class="nav navbar-nav">
+                 @if (Model.ActiveSection == "Home")
+                {
+                     <li class="active"><a href="@Url.Action("Index", "Home")">Tests</a></li>
+                    <li><a href="@Url.Action("Events","Home")">Events</a></li>
+                     <li class="active"><a href="">Calendar</a></li>
+                     if (Model.CurrentUser.Role == "Admin") 
+                    { 
+                        <li><a href="@Url.Action("Users", "Account")">Accounts</a></li>
+                    }
+                    
+                }
+                else if (Model.ActiveSection == "Accounts")
+                {
+                     <li><a href="@Url.Action("Index", "Home")">Tests</a></li>
+                    <li><a href="@Url.Action("Events","Home")">Events</a></li>
+                     <li class="active"><a href="">Calendar</a></li>
+                     if (Model.CurrentUser.Role == "Admin") 
+                    { 
+                        <li class="active"><a href="@Url.Action("Users", "Account")">Accounts</a></li>
+                    }
+                    
+                }
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right" style="padding-right: 15px">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">@Model.CurrentUser.UserSettings.SelectedTheme<span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="@Url.Action("ChangeTheme", "Account", new { theme = "default" })">Default</a></li>
+                        <li><a href="@Url.Action("ChangeTheme", "Account", new { theme = "simplex" })">Simplex</a></li>
+                        <li><a href="@Url.Action("ChangeTheme", "Account", new { theme = "slate" })">Slate</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                        @Model.CurrentUser.Clients.Single(f => f.ClientId == @Model.CurrentUser.UserSettings.SelectedClientId).ClientName
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                        @foreach (var client in Model.CurrentUser.Clients)
+                        {
+                            <li><a href="@Url.Action("ChangeClient", "Account", new { id = client.ClientId })">@client.ClientName</a></li>    
+                        }
+                    </ul>
+                </li>
+
+                <li><a href="#">@Model.CurrentUser.UserName</a></li>
+                <li><a href="@Url.Action("Logout", "Account")">Logout</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+
+

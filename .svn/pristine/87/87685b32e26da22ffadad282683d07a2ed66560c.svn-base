@@ -1,0 +1,76 @@
+﻿if (typeof (TestAndLearn) == 'undefined') {
+    var TestAndLearn = {};
+}
+
+if (typeof (TestAndLearn.Home) == 'undefined') {
+    TestAndLearn.Home = {};
+}
+
+TestAndLearn.Home.RankForm = (function () {
+    var _config;
+
+    return {
+        init: function (config) {
+            _config = config;
+            $('input.span2').bootstrapSlider({});
+
+            $('#rank-test-form').ajaxSubmitWebApi({
+                onBeforeSubmit: function (e) {
+                    $('#rank-modal .model-content').mask('Saving Rank...');
+                },
+                onSuccess: function (response) {
+                    if (response.Success == true) {
+                        $('#rank-modal').modal('hide');
+                        $('#rank-modal .model-content').unmask();
+                        
+                        TestAndLearn.Home.Grids.reloadAll();
+
+                        JQueryUX.Msg.SlideIn({
+                            width: 200,
+                            height: 50,
+                            msg: response.Message,
+                            dockAt: 'tc',
+                            wrapperWidthOffset: 8,
+                            wrapperHeightOffset: 8
+                        });
+                    }
+                    else {
+                        alert(response.Message);
+                    }
+                },
+                onError: function (xhr, status, error) {
+                    alert(error);
+                }
+            });
+        }
+
+       ,editRank: function (testId) {
+            $('#input-rank-testid').val(testId);
+
+            //display initial set values
+            $.ajax({
+                url: _config.getTestUrl,
+                dataType: 'json',
+                type: 'GET',
+                data: {
+                    id: testId
+                },
+                success: function (response) {
+                    var test = response;
+
+                    $('#rank-modal').modal('show');
+                    document.getElementById('rank-test-form').reset();
+                    var pre = '#input-rank-';
+                    $(pre + 'LevelOfEffortToImplement').bootstrapSlider('setValue', test.LevelOfEffortToImplement);
+                    $(pre + 'LevelOfEffortToReportOn').bootstrapSlider('setValue', test.LevelOfEffortToReportOn);
+                    $(pre + 'LevelOfBudget').bootstrapSlider('setValue', test.LevelOfBudget);
+                    $(pre + 'LevelOfImpact').bootstrapSlider('setValue', test.LevelOfImpact);
+
+                },
+                error: function (xhr, status, error) {
+                    alert(error);
+                }
+            });
+        }
+    };
+})();

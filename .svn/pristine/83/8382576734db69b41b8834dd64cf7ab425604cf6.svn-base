@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="b2a0dbfe23e1471f89de349628f11735" Name="Diagram1">
+        <EntityTypeShape EntityType="TestAndLearnModel.Client" Width="1.5" PointX="0.75" PointY="0.875" />
+        <EntityTypeShape EntityType="TestAndLearnModel.UserClientMap" Width="1.5" PointX="3" PointY="1" />
+        <AssociationConnector Association="TestAndLearnModel.FK_UserClientMap_Client" />
+        <EntityTypeShape EntityType="TestAndLearnModel.SuccessMetric" Width="1.5" PointX="3" PointY="6.75" />
+        <EntityTypeShape EntityType="TestAndLearnModel.Test" Width="1.5" PointX="5.25" PointY="2.25" />
+        <EntityTypeShape EntityType="TestAndLearnModel.TestStatu" Width="1.5" PointX="3" PointY="3.875" />
+        <EntityTypeShape EntityType="TestAndLearnModel.TestType" Width="1.5" PointX="7.5" PointY="3.125" />
+        <AssociationConnector Association="TestAndLearnModel.FK_Test_Client" />
+        <AssociationConnector Association="TestAndLearnModel.FK_Test_TestStatus" />
+        <AssociationConnector Association="TestAndLearnModel.ClientSuccessMetricMap" />
+        <AssociationConnector Association="TestAndLearnModel.ClientTestTypeMap" />
+        <AssociationConnector Association="TestAndLearnModel.TestTestTypeMap" />
+        <EntityTypeShape EntityType="TestAndLearnModel.UserSetting" Width="1.5" PointX="7.375" PointY="0.75" />
+        <EntityTypeShape EntityType="TestAndLearnModel.Event" Width="1.5" PointX="3" PointY="10" />
+        <AssociationConnector Association="TestAndLearnModel.FK_Event_Client" />
+        <EntityTypeShape EntityType="TestAndLearnModel.Pillar" Width="1.5" PointX="7.375" PointY="5.875" />
+        <AssociationConnector Association="TestAndLearnModel.FK_Test_Pillar" />
+        <AssociationConnector Association="TestAndLearnModel.FK_Test_SuccessMetric" />
+        <AssociationConnector Association="TestAndLearnModel.ClientPillarMap" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

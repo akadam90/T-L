@@ -1,0 +1,125 @@
+﻿if (typeof (TestAndLearn) == 'undefined') {
+    var TestAndLearn = {};
+}
+
+if (typeof (TestAndLearn.Home) == 'undefined') {
+    TestAndLearn.Home = {};
+}
+
+var debug = {};
+
+TestAndLearn.Home.EventsGrid = (function () {
+
+    var _config;
+    var _offsetHeight = 280;
+
+    var sharedColNames = ['EventId','ClientId','Name','Description','StartDate','EndDate'];
+    var sharedColModel = [
+        {
+            name:'EventId',
+            index:'EventId',
+            hidden: true
+
+        },
+        {
+            name: 'ClientId',
+            index: 'ClientId',
+            hidden : true
+
+        },
+
+        {
+            name: 'EventName',
+            index: 'EventName',
+            sorttype : "string",
+            search: true,
+            searchoptions: { clearsearch: false },
+            stype: 'text',
+            formatter: function (cellvalue, options, obj) {
+                return '<a href="javascript:void(0)" class="edit-event-row" id="edit-event-row-' + obj.EventId + '">' + cellvalue + ' </a>';
+            }
+
+        },
+        {
+            name: 'EventDescription',
+            index: 'EventDescription',
+            sorttype: "string",
+            search: true,
+            searchoptions: { clearsearch: false },
+            stype: 'text'
+        },
+        {
+            name: 'StartDate',
+            index: 'StartDate',
+            sorttype: "date",
+            datefmt: 'mm/dd/yyyy',
+            search: true,
+            searchoptions: {
+                clearSearch: false
+            },
+            stype: 'text',
+            width: 100,
+            fixed: true
+        },
+        {
+            name: 'EndDate',
+            index: 'EndDate',
+            sorttype: "date",
+            datefmt: 'mm/dd/yyyy',
+            search: true,
+            searchoptions: {
+                clearSearch: false
+            },
+            stype: 'text',
+            width: 100,
+            fixed: true
+        }
+
+    ];
+
+
+    return {
+
+        init: function (config) {
+            _config = config;
+            this.initEventsGrid();
+
+        },
+
+        initEventsGrid : function(){
+            var colNames = sharedColNames.slice();
+            var colModel = sharedColModel.slice();
+
+
+            $('#event-grid').jqGrid(
+            {
+                url: _config.getEventsUrl,
+                postData: {
+                    clientId: _config.clientId
+                },
+                datatype: "json",
+                mtype: 'GET',
+                autowidth: true,
+                height: $(document).height() - _offsetHeight,
+                colNames: colNames,
+                colModel: colModel,
+                scroll: true,
+                loadonce: true,
+                viewrecords: true,
+                loadComplete: function (data) {
+                    //activate the event name as a link
+                    $('#submitted-test-grid .edit-event-row').unbind('click');
+
+                    $('#event-grid .edit-event-row').click(function(e){
+                        var id = $(this).attr('id').replace('edit-event-row-','');
+                        TestAndLearn.Home.Forms.editEvent(id);
+                    });
+                },
+
+            });
+        
+        }
+    };
+
+}
+)();

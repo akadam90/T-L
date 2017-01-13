@@ -1,0 +1,79 @@
+﻿<div class="modal fade new-test-modal" id="new-test-modal" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Save Test</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="input-test-name" class="col-sm-4 control-label">Test Name</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="input-test-name" name="Name" placeholder="Test Name" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-test-type" class="col-sm-4 control-label">Test Type</label>
+                        <div class="col-sm-8">
+                            <select class="form-control" id="input-test-type" name="Type">
+                                <option selected="selected">Media</option>
+                                <option>Creative</option>
+                                <option>Web Site</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-test-succcess-metrics" class="col-sm-4 control-label">Success Metric(s)</label>
+                        <div class="col-sm-8">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="" name="SuccessMetricImpressions">
+                                    Impressions
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="" name="SuccessMetricSL">
+                                    SL
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="" name="SuccessMetricQVI">
+                                    QVI
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="" name="SuccessMetricCostPerLine">
+                                    Cost Per Line
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-test-hypothesis" class="col-sm-4 control-label">Hypothesis</label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control" id="input-test-hypothesis" name="Hypothesis" placeholder="Hypothesis"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-test-notes" class="col-sm-4 control-label">Additional Notes</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="input-test-notes" name="Notes" placeholder="Additional Notes" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Save</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

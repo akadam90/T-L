@@ -1,0 +1,277 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="TestAndLearnModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="TestAndLearnEntitiesConnection" annotation:LazyLoadingEnabled="true" a:TypeAccess="Internal" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration">
+    <EntitySet Name="Clients" EntityType="TestAndLearnModel.Client" />
+    <EntitySet Name="UserClientMaps" EntityType="TestAndLearnModel.UserClientMap" />
+    <AssociationSet Name="FK_UserClientMap_Client" Association="TestAndLearnModel.FK_UserClientMap_Client">
+      <End Role="Client" EntitySet="Clients" />
+      <End Role="UserClientMap" EntitySet="UserClientMaps" />
+    </AssociationSet>
+    <EntitySet Name="SuccessMetrics" EntityType="TestAndLearnModel.SuccessMetric" />
+    <EntitySet Name="Tests" EntityType="TestAndLearnModel.Test" />
+    <EntitySet Name="TestStatus" EntityType="TestAndLearnModel.TestStatu" />
+    <EntitySet Name="TestTypes" EntityType="TestAndLearnModel.TestType" />
+    <AssociationSet Name="FK_Test_Client" Association="TestAndLearnModel.FK_Test_Client">
+      <End Role="Client" EntitySet="Clients" />
+      <End Role="Test" EntitySet="Tests" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Test_TestStatus" Association="TestAndLearnModel.FK_Test_TestStatus">
+      <End Role="TestStatu" EntitySet="TestStatus" />
+      <End Role="Test" EntitySet="Tests" />
+    </AssociationSet>
+    <AssociationSet Name="ClientSuccessMetricMap" Association="TestAndLearnModel.ClientSuccessMetricMap">
+      <End Role="Client" EntitySet="Clients" />
+      <End Role="SuccessMetric" EntitySet="SuccessMetrics" />
+    </AssociationSet>
+    <AssociationSet Name="ClientTestTypeMap" Association="TestAndLearnModel.ClientTestTypeMap">
+      <End Role="Client" EntitySet="Clients" />
+      <End Role="TestType" EntitySet="TestTypes" />
+    </AssociationSet>
+    <AssociationSet Name="TestTestTypeMap" Association="TestAndLearnModel.TestTestTypeMap">
+      <End Role="Test" EntitySet="Tests" />
+      <End Role="TestType" EntitySet="TestTypes" />
+    </AssociationSet>
+    <EntitySet Name="UserSettings" EntityType="TestAndLearnModel.UserSetting" />
+    <EntitySet Name="Events" EntityType="TestAndLearnModel.Event" />
+    <AssociationSet Name="FK_Event_Client" Association="TestAndLearnModel.FK_Event_Client">
+      <End Role="Client" EntitySet="Clients" />
+      <End Role="Event" EntitySet="Events" />
+    </AssociationSet>
+    <EntitySet Name="Pillars" EntityType="TestAndLearnModel.Pillar" />
+    <AssociationSet Name="FK_Test_Pillar" Association="TestAndLearnModel.FK_Test_Pillar">
+      <End Role="Pillar" EntitySet="Pillars" />
+      <End Role="Test" EntitySet="Tests" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Test_SuccessMetric" Association="TestAndLearnModel.FK_Test_SuccessMetric">
+      <End Role="SuccessMetric" EntitySet="SuccessMetrics" />
+      <End Role="Test" EntitySet="Tests" />
+    </AssociationSet>
+    <AssociationSet Name="ClientPillarMap" Association="TestAndLearnModel.ClientPillarMap">
+      <End Role="Client" EntitySet="Clients" />
+      <End Role="Pillar" EntitySet="Pillars" />
+    </AssociationSet>
+    <EntitySet Name="TestUrls" EntityType="TestAndLearnModel.TestUrl" />
+    <AssociationSet Name="FK_TestUrl_Test" Association="TestAndLearnModel.FK_TestUrl_Test">
+      <End Role="Test" EntitySet="Tests" />
+      <End Role="TestUrl" EntitySet="TestUrls" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Client">
+    <Key>
+      <PropertyRef Name="ClientId" />
+    </Key>
+    <Property Name="ClientId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ClientName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="LogoImageName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="UserClientMaps" Relationship="TestAndLearnModel.FK_UserClientMap_Client" FromRole="Client" ToRole="UserClientMap" />
+    <NavigationProperty Name="Tests" Relationship="TestAndLearnModel.FK_Test_Client" FromRole="Client" ToRole="Test" />
+    <NavigationProperty Name="SuccessMetrics" Relationship="TestAndLearnModel.ClientSuccessMetricMap" FromRole="Client" ToRole="SuccessMetric" />
+    <NavigationProperty Name="TestTypes" Relationship="TestAndLearnModel.ClientTestTypeMap" FromRole="Client" ToRole="TestType" />
+    <NavigationProperty Name="Events" Relationship="TestAndLearnModel.FK_Event_Client" FromRole="Client" ToRole="Event" />
+    <NavigationProperty Name="Pillars" Relationship="TestAndLearnModel.ClientPillarMap" FromRole="Client" ToRole="Pillar" />
+  </EntityType>
+  <EntityType Name="UserClientMap">
+    <Key>
+      <PropertyRef Name="UserId" />
+    </Key>
+    <Property Name="UserId" Type="Guid" Nullable="false" />
+    <Property Name="ClientId" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Client" Relationship="TestAndLearnModel.FK_UserClientMap_Client" FromRole="UserClientMap" ToRole="Client" />
+  </EntityType>
+  <Association Name="FK_UserClientMap_Client">
+    <End Type="TestAndLearnModel.Client" Role="Client" Multiplicity="1" />
+    <End Type="TestAndLearnModel.UserClientMap" Role="UserClientMap" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Client">
+        <PropertyRef Name="ClientId" />
+      </Principal>
+      <Dependent Role="UserClientMap">
+        <PropertyRef Name="ClientId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="SuccessMetric">
+    <Key>
+      <PropertyRef Name="SuccessMetricId" />
+    </Key>
+    <Property Name="SuccessMetricId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="Clients" Relationship="TestAndLearnModel.ClientSuccessMetricMap" FromRole="SuccessMetric" ToRole="Client" />
+    <NavigationProperty Name="Tests" Relationship="TestAndLearnModel.FK_Test_SuccessMetric" FromRole="SuccessMetric" ToRole="Test" />
+  </EntityType>
+  <EntityType Name="Test">
+    <Key>
+      <PropertyRef Name="TestId" />
+    </Key>
+    <Property Name="TestId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ClientId" Type="Int32" Nullable="false" />
+    <Property Name="SubmittedOn" Type="DateTime" Nullable="false" Precision="0" />
+    <Property Name="SubmittedBy" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+    <Property Name="Name" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+    <Property Name="Hypothesis" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="false" />
+    <Property Name="AdditionalNotes" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+    <Property Name="ExpectedBusinessValue" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+    <Property Name="Quarter" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
+    <Property Name="Year" Type="Int32" />
+    <Property Name="TestStatusId" Type="Int32" Nullable="false" />
+    <Property Name="StartDate" Type="DateTime" Precision="0" />
+    <Property Name="EndDate" Type="DateTime" Precision="0" />
+    <Property Name="Outcome" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+    <Property Name="Recommendation" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="Client" Relationship="TestAndLearnModel.FK_Test_Client" FromRole="Test" ToRole="Client" />
+    <NavigationProperty Name="TestStatu" Relationship="TestAndLearnModel.FK_Test_TestStatus" FromRole="Test" ToRole="TestStatu" />
+    <NavigationProperty Name="TestTypes" Relationship="TestAndLearnModel.TestTestTypeMap" FromRole="Test" ToRole="TestType" />
+    <Property Name="LevelOfEffortToImplement" Type="Int32" />
+    <Property Name="LevelOfEffortToReportOn" Type="Int32" />
+    <Property Name="LevelOfBudget" Type="Int32" />
+    <Property Name="LevelOfImpact" Type="Int32" />
+    <Property Name="SuccessMetricId" Type="Int32" />
+    <Property Name="PillarId" Type="Int32" />
+    <NavigationProperty Name="Pillar" Relationship="TestAndLearnModel.FK_Test_Pillar" FromRole="Test" ToRole="Pillar" />
+    <NavigationProperty Name="SuccessMetric" Relationship="TestAndLearnModel.FK_Test_SuccessMetric" FromRole="Test" ToRole="SuccessMetric" />
+    <NavigationProperty Name="TestUrls" Relationship="TestAndLearnModel.FK_TestUrl_Test" FromRole="Test" ToRole="TestUrl" />
+  </EntityType>
+  <EntityType Name="TestStatu">
+    <Key>
+      <PropertyRef Name="TestStatusId" />
+    </Key>
+    <Property Name="TestStatusId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="Tests" Relationship="TestAndLearnModel.FK_Test_TestStatus" FromRole="TestStatu" ToRole="Test" />
+  </EntityType>
+  <EntityType Name="TestType">
+    <Key>
+      <PropertyRef Name="TestTypeId" />
+    </Key>
+    <Property Name="TestTypeId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="Clients" Relationship="TestAndLearnModel.ClientTestTypeMap" FromRole="TestType" ToRole="Client" />
+    <NavigationProperty Name="Tests" Relationship="TestAndLearnModel.TestTestTypeMap" FromRole="TestType" ToRole="Test" />
+  </EntityType>
+  <Association Name="FK_Test_Client">
+    <End Type="TestAndLearnModel.Client" Role="Client" Multiplicity="1" />
+    <End Type="TestAndLearnModel.Test" Role="Test" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Client">
+        <PropertyRef Name="ClientId" />
+      </Principal>
+      <Dependent Role="Test">
+        <PropertyRef Name="ClientId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Test_TestStatus">
+    <End Type="TestAndLearnModel.TestStatu" Role="TestStatu" Multiplicity="1" />
+    <End Type="TestAndLearnModel.Test" Role="Test" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TestStatu">
+        <PropertyRef Name="TestStatusId" />
+      </Principal>
+      <Dependent Role="Test">
+        <PropertyRef Name="TestStatusId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ClientSuccessMetricMap">
+    <End Type="TestAndLearnModel.Client" Role="Client" Multiplicity="*" />
+    <End Type="TestAndLearnModel.SuccessMetric" Role="SuccessMetric" Multiplicity="*" />
+  </Association>
+  <Association Name="ClientTestTypeMap">
+    <End Type="TestAndLearnModel.Client" Role="Client" Multiplicity="*" />
+    <End Type="TestAndLearnModel.TestType" Role="TestType" Multiplicity="*" />
+  </Association>
+  <Association Name="TestTestTypeMap">
+    <End Type="TestAndLearnModel.Test" Role="Test" Multiplicity="*" />
+    <End Type="TestAndLearnModel.TestType" Role="TestType" Multiplicity="*" />
+  </Association>
+  <EntityType Name="UserSetting">
+    <Key>
+      <PropertyRef Name="UserId" />
+    </Key>
+    <Property Name="UserId" Type="Guid" Nullable="false" />
+    <Property Name="SelectedClientId" Type="Int32" />
+    <Property Name="SelectedTheme" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="Event">
+    <Key>
+      <PropertyRef Name="EventId" />
+    </Key>
+    <Property Name="EventId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+    <Property Name="Description" Type="String" MaxLength="2000" FixedLength="false" Unicode="false" />
+    <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="0" />
+    <Property Name="EndDate" Type="DateTime" Nullable="false" Precision="0" />
+    <Property Name="ClientId" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Client" Relationship="TestAndLearnModel.FK_Event_Client" FromRole="Event" ToRole="Client" />
+  </EntityType>
+  <Association Name="FK_Event_Client">
+    <End Type="TestAndLearnModel.Client" Role="Client" Multiplicity="1" />
+    <End Type="TestAndLearnModel.Event" Role="Event" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Client">
+        <PropertyRef Name="ClientId" />
+      </Principal>
+      <Dependent Role="Event">
+        <PropertyRef Name="ClientId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="Pillar">
+    <Key>
+      <PropertyRef Name="PillarId" />
+    </Key>
+    <Property Name="PillarId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="Tests" Relationship="TestAndLearnModel.FK_Test_Pillar" FromRole="Pillar" ToRole="Test" />
+    <NavigationProperty Name="Clients" Relationship="TestAndLearnModel.ClientPillarMap" FromRole="Pillar" ToRole="Client" />
+  </EntityType>
+  <Association Name="FK_Test_Pillar">
+    <End Type="TestAndLearnModel.Pillar" Role="Pillar" Multiplicity="0..1" />
+    <End Type="TestAndLearnModel.Test" Role="Test" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Pillar">
+        <PropertyRef Name="PillarId" />
+      </Principal>
+      <Dependent Role="Test">
+        <PropertyRef Name="PillarId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Test_SuccessMetric">
+    <End Type="TestAndLearnModel.SuccessMetric" Role="SuccessMetric" Multiplicity="0..1" />
+    <End Type="TestAndLearnModel.Test" Role="Test" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="SuccessMetric">
+        <PropertyRef Name="SuccessMetricId" />
+      </Principal>
+      <Dependent Role="Test">
+        <PropertyRef Name="SuccessMetricId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ClientPillarMap">
+    <End Type="TestAndLearnModel.Client" Role="Client" Multiplicity="*" />
+    <End Type="TestAndLearnModel.Pillar" Role="Pillar" Multiplicity="*" />
+  </Association>
+  <EntityType Name="TestUrl">
+    <Key>
+      <PropertyRef Name="TestId" />
+      <PropertyRef Name="Url" />
+    </Key>
+    <Property Name="TestId" Type="Int32" Nullable="false" />
+    <Property Name="Url" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="Test" Relationship="TestAndLearnModel.FK_TestUrl_Test" FromRole="TestUrl" ToRole="Test" />
+  </EntityType>
+  <Association Name="FK_TestUrl_Test">
+    <End Type="TestAndLearnModel.Test" Role="Test" Multiplicity="1" />
+    <End Type="TestAndLearnModel.TestUrl" Role="TestUrl" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Test">
+        <PropertyRef Name="TestId" />
+      </Principal>
+      <Dependent Role="TestUrl">
+        <PropertyRef Name="TestId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

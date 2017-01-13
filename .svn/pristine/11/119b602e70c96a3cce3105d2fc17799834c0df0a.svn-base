@@ -1,0 +1,109 @@
+﻿@model TestAndLearn.Web.Models.TestFormModel
+
+<div class="modal fade new-test-modal" id="save-test-modal" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Save Test</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="save-test-form" action="@Url.Action("SaveBaseTest", "api/TestApi")" method="POST">
+                    <input type="hidden" id="input-test-clientid" name="ClientId" value="@Model.ClientId" />
+                    <input type="hidden" id="input-test-testid" name="TestId" value="null" />
+                    
+                    <div class="form-group">
+                        <label for="input-test-name" class="col-sm-4 control-label">Test Name</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="input-test-name" name="Name" placeholder="Test Name" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-test-type" class="col-sm-4 control-label">Test Type</label>
+                        <div class="col-sm-8">
+                            @foreach (var testType in Model.TestTypes)
+                            {
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" value="@testType.TestTypeId" id="input-test-testtype-@testType.TestTypeId" name="TestTypes[].TestTypeId">
+                                        @testType.Name
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-test-succcess-metrics" class="col-sm-4 control-label">Success Metric(s)</label>
+                        <div class="col-sm-8">
+                            @foreach (var successMetric in Model.SuccessMetrics)
+                            {
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" value="@successMetric.SuccessMetricId" id="input-test-successmetric-@successMetric.SuccessMetricId" name="SuccessMetrics[].SuccessMetricId">
+                                        @successMetric.Name
+                                    </label>
+                                </div>
+                            }                      
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-test-quarter" class="col-sm-4 control-label">Quarter</label>
+                        <div class="col-sm-8">
+                            <select id="input-test-quarter" name="Quarter" class="form-control">
+                                <option selected="selected" value="null">-</option>
+                                <option value="Q1">Q1</option>
+                                <option value="Q2">Q2</option>
+                                <option value="Q3">Q3</option>
+                                <option value="Q4">Q4</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-test-year" class="col-sm-4 control-label">Year</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="input-test-year" name="Year" placeholder="YYYY" maxlength="4" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-test-hypothesis" class="col-sm-4 control-label">Hypothesis</label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control" id="input-test-hypothesis" name="Hypothesis" placeholder="Hypothesis"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-test-notes" class="col-sm-4 control-label">Additional Notes</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="input-test-additionalnotes" name="AdditionalNotes" placeholder="Additional Notes" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-test-notes" class="col-sm-4 control-label">Expected Business Value</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="input-test-expectedbusinessvalue" name="ExpectedBusinessValue" placeholder="Expected Business Value" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-test-expected-business-value" class="col-sm-4 control-label">Submitted By</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="input-test-submittedby" name="SubmittedBy" value="@Model.SuggesstedSubmitter" />
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+            
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

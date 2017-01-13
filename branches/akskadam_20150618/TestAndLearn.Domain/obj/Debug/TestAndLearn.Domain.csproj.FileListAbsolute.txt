@@ -1,0 +1,5 @@
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain\bin\Debug\TestAndLearn.Domain.dll
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain\bin\Debug\TestAndLearn.Domain.pdb
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain\obj\Debug\TestAndLearn.Domain.csprojResolveAssemblyReference.cache
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain\obj\Debug\TestAndLearn.Domain.dll
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain\obj\Debug\TestAndLearn.Domain.pdb

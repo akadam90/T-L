@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace TestAndLearn.Web.Models
+{
+    public class NavigationModel
+    {
+        public string ActiveSection { get; set; }
+        public string CurrentUsername { get; set; }
+        public string CurrentClientName { get; set; }
+        public string ActiveTheme { get; set; }
+    }
+}

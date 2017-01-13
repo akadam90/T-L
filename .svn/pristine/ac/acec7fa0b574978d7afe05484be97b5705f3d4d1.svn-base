@@ -1,0 +1,178 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web.Security;
+using TestAndLearn.Domain.Models;
+
+namespace TestAndLearn.Domain.Infrastructure
+{
+    public class UserRepository : IUserRepository
+    {
+        public IList<UserModel> GetUsers()
+        {
+            var membershipUsers = Membership.GetAllUsers();
+
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                var map = from l in connection.UserClientMaps
+                                   .Include("Client")
+                                   select l;
+
+                var list = new List<UserModel>();
+
+                foreach (MembershipUser memberUser in membershipUsers)
+                {
+                    var info = map.SingleOrDefault(f => f.UserId == (Guid)memberUser.ProviderUserKey);
+
+                    list.Add(new UserModel()
+                    {
+                        UserName = memberUser.UserName,
+                        Email = memberUser.Email,
+                        Role = Roles.GetRolesForUser(memberUser.UserName).First(),
+                        ClientId = (info != null) ? info.ClientId : -1,
+                        ClientName = (info != null) ? info.Client.ClientName : "All Clients"
+                    });
+                };
+
+                return list;
+            }
+        }
+
+        public UserModel GetUser(string username)
+        {
+            var user = Membership.GetUser(username);
+
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                var map = connection.UserClientMaps.SingleOrDefault(f => f.UserId == (Guid)user.ProviderUserKey);
+
+                return new UserModel()
+                {
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    Role = Roles.GetRolesForUser(user.UserName).First(),
+                    ClientId = (map != null) ? map.ClientId : -1,
+                    ClientName = (map != null) ? map.Client.ClientName : "All Clients"
+                };
+            }
+        }
+
+        public void CreateUser(UserModel user, string password)
+        {
+            MembershipCreateStatus createStatus;
+            var memberUser = Membership.CreateUser(user.UserName, password, user.Email, null, null, true, null, out createStatus);
+
+            if (createStatus == MembershipCreateStatus.Success)
+            {
+                Roles.AddUserToRole(user.UserName, user.Role);
+
+                if (user.Role == "Client")
+                {
+                    memberUser.Comment = "changepassword";
+                    Membership.UpdateUser(memberUser);
+                }
+                else
+                {
+                    memberUser.Comment = "";
+                    Membership.UpdateUser(memberUser);
+                }
+
+                if (user.Role != "Admin")
+                {
+                    if (user.ClientId <= 0)
+                    {
+                        Membership.DeleteUser(user.UserName);
+                        throw new Exception("A Client must be selected for all non admin accounts.");
+                    }
+
+                    using (var connection = new TestAndLearnEntitiesConnection())
+                    {
+                        connection.UserClientMaps.Add(new UserClientMap()
+                        {
+                            UserId = (Guid)memberUser.ProviderUserKey,
+                            ClientId = user.ClientId
+                        });
+
+                        connection.SaveChanges();
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception(this.ErrorCodeToString(createStatus));
+            }
+        }
+
+        public void UpdateUser(UserModel user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteUser(string username)
+        {
+            using (var connection = new TestAndLearnEntitiesConnection())
+            {
+                var user = Membership.GetUser(username);
+                var map = connection.UserClientMaps.SingleOrDefault(f => f.UserId == (Guid)user.ProviderUserKey);
+
+                if (map != null)
+                {
+                    connection.UserClientMaps.Remove(map);
+                }
+
+                Membership.DeleteUser(username);
+
+                connection.SaveChanges();
+            }
+        }
+
+        public string[] GetRoles()
+        {
+            return Roles.GetAllRoles();
+        }
+
+        #region Private Methods
+
+        private string ErrorCodeToString(MembershipCreateStatus createStatus)
+        {
+            // See http://go.microsoft.com/fwlink/?LinkID=177550 for
+            // a full list of status codes.
+            switch (createStatus)
+            {
+                case MembershipCreateStatus.DuplicateUserName:
+                    return "User name already exists. Please enter a different user name.";
+
+                case MembershipCreateStatus.DuplicateEmail:
+                    return "A user name for that e-mail address already exists. Please enter a different e-mail address.";
+
+                case MembershipCreateStatus.InvalidPassword:
+                    return "The password provided is invalid. Please enter a valid password value.";
+
+                case MembershipCreateStatus.InvalidEmail:
+                    return "The e-mail address provided is invalid. Please check the value and try again.";
+
+                case MembershipCreateStatus.InvalidAnswer:
+                    return "The password retrieval answer provided is invalid. Please check the value and try again.";
+
+                case MembershipCreateStatus.InvalidQuestion:
+                    return "The password retrieval question provided is invalid. Please check the value and try again.";
+
+                case MembershipCreateStatus.InvalidUserName:
+                    return "The user name provided is invalid. Please check the value and try again.";
+
+                case MembershipCreateStatus.ProviderError:
+                    return "The authentication provider returned an error. Please verify your entry and try again. If the problem persists, please contact your system administrator.";
+
+                case MembershipCreateStatus.UserRejected:
+                    return "The user creation request has been canceled. Please verify your entry and try again. If the problem persists, please contact your system administrator.";
+
+                default:
+                    return "An unknown error occurred. Please verify your entry and try again. If the problem persists, please contact your system administrator.";
+            }
+        }
+
+        #endregion Private Methods
+    }
+}

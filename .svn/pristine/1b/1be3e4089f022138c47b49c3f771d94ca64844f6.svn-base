@@ -1,0 +1,85 @@
+﻿if (typeof (TestAndLearn) == 'undefined') {
+    var TestAndLearn = {};
+}
+
+if (typeof (TestAndLearn.Home) == 'undefined') {
+    TestAndLearn.Home = {};
+}
+
+TestAndLearn.Home.EventForm = (function () {
+    var _config;
+
+    return {
+        init: function (config) {
+            _config = config;
+            
+            $('#save-event-form').ajaxSubmitWebApi({
+                onBeforeSubmit: function (e) {
+                    $('#EventModal .model-content').mask('Saving Event...');
+                },
+                onSuccess: function (response) {
+                    if (response.Success == true) {
+                        $('#EventModal').modal('hide');
+                        $('#EventModal .model-content').unmask();
+                        
+                        $('#event-grid').jqGrid('setGridParam', { datatype: 'json' }).trigger('reloadGrid');
+
+                        JQueryUX.Msg.SlideIn({
+                            width: 200,
+                            height: 50,
+                            msg: response.Message,
+                            dockAt: 'tc',
+                            wrapperWidthOffset: 8,
+                            wrapperHeightOffset: 8
+                        });
+                    }
+                    else {
+                        alert(response.Message);
+                    }
+                },
+                onError: function (xhr, status, error) {
+                    alert(error);
+                }
+            });
+
+            $('#new-event-btn').click(function () {
+                TestAndLearn.Home.EventForm.newEvent();
+            });
+        }
+
+        , newEvent: function () {
+            $('#EventModal').modal('show');
+            document.getElementById('save-event-form').reset();
+            $('#input-event-ClientId').val(_config.clientId);
+            $('#input-event-EventId').val('0'); //for new Event
+        }
+
+       , editEvent: function (eventId) {
+           $.ajax({
+               url: _config.EditEventUrl,
+               datatype: 'json',
+               type: 'GET',
+               data: {
+                   id: eventId
+               },
+               success: function (response) {
+                   var event = response;
+                   $('#EventModal').modal('show');
+                   document.getElementById('save-event-form').reset();
+                   $('#input-event-EventId').val(event.EventId);
+                   $('#input-event-ClientId').val(event.ClientId);
+                   $('#input-event-name').val(event.EventName);
+                   $('#input-event-description').val(event.EventDescription);
+                   $('#event-startdate').val(event.StartDate);
+                   $('#event-enddate').val(event.EndDate)
+
+               },
+               error: function (xhr, status, error) {
+                   alert(error);
+               }
+
+           });
+
+       }
+    };
+})();

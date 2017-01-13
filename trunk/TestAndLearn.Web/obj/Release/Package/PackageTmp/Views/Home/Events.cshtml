@@ -1,0 +1,44 @@
+﻿@using TestAndLearn.Web.Extensions
+@model TestAndLearn.Domain.Models.UserModel
+
+@{
+    ViewBag.Title = "Events";
+    ViewBag.ActiveSection = "Events";
+    Layout = "~/Views/Layouts/_Master.cshtml";
+}
+
+<div class="row">
+    <img src="@Url.Content("~/Images/ClientLogos/" + Model.Clients.Single(f => f.ClientId == Model.UserSettings.SelectedClientId).LogoImageName)" />
+</div>
+<div class="row">
+    <button type="button" class="btn btn-primary" id="new-event-btn">New Event</button>
+</div>
+
+    <div class="ux-grid-wrapper">
+        <table id="event-grid"></table>
+    </div>
+
+    
+
+ @section MoreScripts{
+    <script type="text/javascript" src="@Url.ContentNoCaching("~/Scripts/Home/EventsGrid.js")"></script>
+    
+    <script type="text/javascript">
+        var d = {};
+        $(function () {
+            TestAndLearn.Home.EventsGrid.init({
+                clientId: @Model.UserSettings.SelectedClientId,
+                getEventsUrl : '@Url.Action("GetEvents","api/EventApi")'
+                   
+            });
+        });
+
+    </script>
+}
+
+@section PartialsWithScripts {
+    @Html.Partial("EventForm", Model.UserSettings.SelectedClientId)
+    @Html.Partial("_DeleteEvent")
+}
+
+

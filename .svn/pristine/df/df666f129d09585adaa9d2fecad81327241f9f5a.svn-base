@@ -1,0 +1,102 @@
+﻿if (typeof (TestAndLearn) == 'undefined') {
+    var TestAndLearn = {};
+}
+
+if (typeof (TestAndLearn.Home) == 'undefined') {
+    TestAndLearn.Home = {};
+}
+
+TestAndLearn.Home.TestForm = (function () {
+    var _config;
+
+    return {
+        init: function (config) {
+            _config = config;
+
+            $('#save-test-form').ajaxSubmitWebApi({
+                onBeforeSubmit: function (e) {
+                    $('#save-test-modal .model-content').mask('Saving Test...');
+                },
+                onSuccess: function (response) {
+                    $('#save-test-modal').modal('hide');
+                    $('#save-test-modal .model-content').unmask();
+                        
+                    if (response.Success == true) {
+                        TestAndLearn.Home.Grids.reloadAll();
+
+                        JQueryUX.Msg.SlideIn({
+                            width: 200,
+                            height: 50,
+                            msg: response.Message,
+                            dockAt: 'tc',
+                            wrapperWidthOffset: 8,
+                            wrapperHeightOffset: 8
+                        });
+                    }
+                    else {
+                        alert(response.Message);
+                    }
+                },
+                onError: function (xhr, status, error) {
+                    alert(error);
+                }
+            });
+
+            $('#new-test-btn').click(function () {
+                TestAndLearn.Home.TestForm.newTest();
+            });
+        }
+
+        ,newTest: function () {
+            $('#save-test-modal').modal('show');
+            document.getElementById('save-test-form').reset();
+            var pre = '#input-test-';
+            $(pre + 'clientid').val(_config.clientId);
+            $(pre + 'testid').val(0);
+        }
+
+        ,editTest: function (testId) {
+            $.ajax({
+                url: _config.getTestUrl,
+                dataType: 'json',
+                type: 'GET',
+                data: {
+                    id: testId
+                },
+                success: function (response) {
+                    var test = response;
+
+                    $('#save-test-modal').modal('show');
+                    document.getElementById('save-test-form').reset();
+
+                    var pre = '#input-test-';
+                    $(pre + 'clientid').val(test.ClientId);
+                    $(pre + 'testid').val(test.TestId);
+                    $(pre + 'name').val(test.Name);
+                    $(pre + 'hypothesis').val(test.Hypothesis);
+                    $(pre + 'additionalnotes').val(test.AdditionalNotes);
+                    $(pre + 'expectedbusinessvalue').val(test.ExpectedBusinessValue);
+                    $(pre + 'submittedby').val(test.SubmittedBy);
+                    $(pre + 'quarter').val(test.Quarter);
+                    $(pre + 'year').val(test.Year);
+
+                    if (typeof (test.SuccessMetric) == 'object' && test.SuccessMetric != null) {
+                        $(pre + 'successmetric').val(test.SuccessMetric.SuccessMetricId);
+                    }
+
+                    if (typeof (test.Pillar) == 'object' && test.Pillar != null) {
+                        $(pre + 'pillar').val(test.Pillar.PillarId);
+                    }
+
+                    //test types
+                    for (var i = 0; i < test.TestTypes.length; i++) {
+                        $(pre + 'testtype-' + test.TestTypes[i].TestTypeId).attr('checked', 'checked');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert(error);
+                }
+            });
+        }
+    };
+})();

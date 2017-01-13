@@ -1,0 +1,12 @@
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain.Infrastructure\bin\Debug\TestAndLearn.Domain.Infrastructure.dll.config
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain.Infrastructure\bin\Debug\TestAndLearn.Domain.Infrastructure.dll
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain.Infrastructure\bin\Debug\TestAndLearn.Domain.Infrastructure.pdb
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain.Infrastructure\bin\Debug\EntityFramework.dll
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain.Infrastructure\bin\Debug\EntityFramework.SqlServer.dll
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain.Infrastructure\bin\Debug\TestAndLearn.Domain.dll
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain.Infrastructure\bin\Debug\TestAndLearn.Domain.pdb
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain.Infrastructure\bin\Debug\EntityFramework.xml
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain.Infrastructure\bin\Debug\EntityFramework.SqlServer.xml
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain.Infrastructure\obj\Debug\TestAndLearn.Domain.Infrastructure.csprojResolveAssemblyReference.cache
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain.Infrastructure\obj\Debug\TestAndLearn.Domain.Infrastructure.dll
+C:\Projects\TestAndLearn\branches\akskadam_20150618\TestAndLearn.Domain.Infrastructure\obj\Debug\TestAndLearn.Domain.Infrastructure.pdb

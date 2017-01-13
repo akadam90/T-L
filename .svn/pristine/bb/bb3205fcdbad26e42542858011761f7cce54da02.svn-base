@@ -1,0 +1,51 @@
+﻿@model TestAndLearn.Domain.Models.UserModel
+
+@{
+    ViewBag.Title = "Events";
+    ViewBag.ActiveSection = "Events";
+    Layout = "~/Views/Layouts/_Master.cshtml";
+}
+<h2 class="row">@Model.UserSettings.SelectedClientName</h2>
+   
+<div class="row">
+    <button type="button" class="btn btn-primary" id="new-event-btn">New Event</button>
+</div>
+
+    <div class="ux-grid-wrapper">
+        <table id="event-grid"></table>
+    </div>
+
+    
+
+ @section MoreScripts{
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Home/EventsGrid.js")"></script>
+    
+    <script type="text/javascript">
+        var d = {};
+        $(function () {
+            TestAndLearn.Home.EventsGrid.init({
+                clientId: @Model.UserSettings.SelectedClientId,
+                getEventsUrl : '@Url.Action("GetEvents","api/EventApi")'
+                   
+            });
+
+            $('#event-tab-panel a[data-toggle="tab"]').on('shown.bs.tab', function (e){
+                d.e = e;
+                if (e.target.toString().indexOf('event') > -1) {
+                    $('#event-grid').jqGrid('setGridParam', {datatype:'json'}).trigger('reloadGrid');
+
+                }
+            })
+
+
+        });
+
+    </script>
+}
+
+@section PartialsWithScripts {
+    @Html.Partial("EventForm", Model.UserSettings.SelectedClientId)
+    @Html.Partial("_DeleteEvent")
+}
+
+

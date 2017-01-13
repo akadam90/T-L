@@ -1,0 +1,265 @@
+﻿if (typeof (TestAndLearn) == 'undefined') {
+    var TestAndLearn = {};
+}
+
+TestAndLearn.IndexControls = (function () {
+    var _config;
+    var _offsetHeight = 400;
+
+    var _testData = [
+        {
+            Id: 1,
+            CreatedOn: '05/01/2015',
+            Name: 'Coupon Code Test',
+            Type: 'Media',
+            SuccessMetrics: ['Impressions', 'Cost Per Line'],
+            Hypothesis: 'An initial analysis indicates that people who presented a coupon code are more likely to purchase.',
+            AdditionalNotes: '',
+            ExpectedBusinessValue: 'More $$$',
+            TestingQuarter: 'Q1',
+            Rank: 1
+        },
+        {
+            Id: 2,
+            CreatedOn: '05/25/2015',
+            Name: 'Coupon Code Test 25%',
+            Type: 'Media',
+            SuccessMetrics: ['Impressions', 'Cost Per Line'],
+            Hypothesis: 'An initial analysis indicates that people who presented a coupon code are more likely to purchase if it is 25% or higher.',
+            AdditionalNotes: '',
+            ExpectedBusinessValue: 'More $$$',
+            TestingQuarter: 'Q1',
+            Rank: 2
+        },
+        {
+            Id: 3,
+            CreatedOn: '06/01/2015',
+            Name: 'Coupon Code Test BOGO',
+            Type: 'Media',
+            SuccessMetrics: ['Impressions', 'Cost Per Line'],
+            Hypothesis: 'An initial analysis indicates that people who presented a coupon code are more likely to purchase if it is buy one get one free.',
+            AdditionalNotes: '',
+            ExpectedBusinessValue: 'More $$$',
+            TestingQuarter: 'Q1',
+            Rank: 1
+        },
+        {
+            Id: 4,
+            CreatedOn: '06/01/2015',
+            Name: 'Another Test',
+            Type: 'Media',
+            SuccessMetrics: ['Impressions', 'Cost Per Line'],
+            Hypothesis: 'An initial analysis indicates that people who presented a coupon code are more likely to purchase if it is buy one get one free.An initial analysis indicates that people who presented a coupon code are more likely to purchase if it is buy one get one free.An initial analysis indicates that people who presented a coupon code are more likely to purchase if it is buy one get one free.An initial analysis indicates that people who presented a coupon code are more likely to purchase if it is buy one get one free.An initial analysis indicates that people who presented a coupon code are more likely to purchase if it is buy one get one free.An initial analysis indicates that people who presented a coupon code are more likely to purchase if it is buy one get one free.An initial analysis indicates that people who presented a coupon code are more likely to purchase if it is buy one get one free.An initial analysis indicates that people who presented a coupon code are more likely to purchase if it is buy one get one free.',
+            AdditionalNotes: '',
+            ExpectedBusinessValue: 'More $$$',
+            TestingQuarter: 'Q1',
+            Rank: 1
+        }
+    ];
+
+    var _sharedColNames = ['Id', 'Date', 'Test Name', 'Test Type', 'Success Metric(s)', 'Expected Business Value', 'Quarter', 'Rank', 'Hypothesis', 'Additional Notes', 'Approve'];
+    var _sharedColModel = [
+                    {
+                        name: 'Id',
+                        index: 'Id',
+                        hidden: true
+                    },
+                    {
+                        name: 'CreatedOn',
+                        index: 'CreatedOn',
+                        sorttype: "date",
+                        datefmt: 'mm/dd/yyyy',
+                        search: true,
+                        searchoptions: {
+                            clearSearch: false
+                        },
+                        stype: 'text',
+                        width: 100,
+                        fixed: true
+                    },
+                    {
+                        name: 'Name',
+                        index: 'Name',
+                        sorttype: "string",
+                        search: true,
+                        searchoptions: {
+                            clearSearch: false
+                        },
+                        stype: 'text',
+                        formatter: function (cellvalue, options, obj) {
+                            return '<a href="javascript:void(0)" class="edit-row" id="edit-row-' + obj.Id + '">' + cellvalue + ' : <span style="color:red">' + obj.Id + '</span></a>';
+                        }
+                    },
+                    {
+                        name: 'Type',
+                        index: 'Type',
+                        width: 80,
+                        fixed: true,
+                        search: true,
+                        stype: 'select',
+                        searchoptions: { value: ":All;Media:Media;Creative:Creative;Website:Website", clearSearch: false }
+                    },
+                    {
+                        name: 'SuccessMetrics',
+                        index: 'SuccessMetrics',
+                        sorttype: "string",
+                        search: true,
+                        searchoptions: {
+                            clearSearch: false
+                        },
+                        stype: 'text'
+                    },
+                    {
+                        name: 'ExpectedBusinessValue',
+                        index: 'ExpectedBusinessValue',
+                        sorttype: "string",
+                        search: true,
+                        searchoptions: {
+                            clearSearch: false
+                        },
+                        stype: 'text'
+                    },
+                    {
+                        name: 'TestingQuarter',
+                        index: 'TestingQuarter',
+                        sorttype: "string",
+                        search: true,
+                        searchoptions: {
+                            clearSearch: false
+                        },
+                        stype: 'text',
+                        width: 80,
+                        fixed: true
+                    },
+                    {
+                        name: 'Rank',
+                        index: 'Rank',
+                        sorttype: "number",
+                        search: true,
+                        stype: 'text',
+                        searchoptions: {
+                            clearSearch: false
+                        },
+                        width: 80,
+                        fixed: true
+                    },
+                    {
+                        name: 'Hypothesis',
+                        index: 'Hypothesis',
+                        hidden: true
+                    },
+                    {
+                        name: 'AdditionalNotes',
+                        index: 'AdditionalNotes',
+                        hidden: true
+                    },{
+                        name: '',
+                        index: '',
+                        search: false,
+                        width: 80,
+                        fixed: true,
+                        formatter: function (cellvalue, options, rowObject) {
+                            return '<button class="approve-row btn btn-info" id="approve-row-' + rowObject.Id + '">approve</button>';
+                        }
+                    }
+    ];
+
+    return {
+        init: function (config) {
+            _config = config;
+
+            this.initGrid('submitted-test-grid', _testData);
+            this.initGrid('approved-test-grid', []);
+            this.initGrid('closed-test-grid', []);
+        },
+
+        initGrid: function (renderTo, data) {
+            $('#' + renderTo).jqGrid({
+                data: data,
+                datatype: "local",
+                width: '50%',
+                autowidth: true,
+                height: $(document).height() - _offsetHeight,
+                //cellsubmit: 'clientArray',
+                //editurl: 'clientArray',
+                colNames: _sharedColNames,
+                colModel: _sharedColModel,
+                scroll: true,
+                viewrecords: true,
+                onSelectRow: function (rowid) {
+                    
+                },
+                afterInsertRow: function (rowid, rowdata, rowelem) {
+
+                },
+                afterRestoreRow: function () {
+                    
+                },
+                afterSaveCell: function (rowid, cellname, value, iRow, iCol) {
+                    
+                },
+                loadComplete: function (data) {
+                    $(this).parent().children('div.empty-grid').first().remove();
+
+                    if (data.rows.length == 0) {
+                        $(this).parent().append([
+                            '<div class="empty-grid bs-callout bs-callout-warning row">',
+                            '<h4>No Tests</h4>',
+                            '<p>',
+                                'There are no tests of the selected status and filter.',
+                            '</p>',
+                            '</div>'].join(''));
+
+                    }
+                    else {
+                        $('#' + renderTo + ' .edit-row').unbind('click');
+
+                        $('#' + renderTo + ' .edit-row').click(function (e) {
+                            var id = $(this).attr('id').replace('edit-row-', '');
+                            alert('TODO edit ' + id)
+                        });
+
+                        $('#' + renderTo + ' .approve-row').unbind('click');
+                        $('#' + renderTo + ' .approve-row').click(function (e) {
+                            var id = $(this).attr('id').replace('approve-row-', '');
+                            alert('TODO approve ' + id)
+                        });
+                    }
+                },
+                subGrid: true,
+                subGridRowExpanded: function (subgrid_id, row_id) {
+                    var row = $(this).getRowData(row_id);
+
+                    var hypothesis = [
+                        '<div class="bs-callout bs-callout-info row">',
+                            '<h4>Hypothesis</h4>',
+                            '<p>',
+                                row.Hypothesis,
+                            '</p>',
+                        '</div>'].join('');
+
+                    var additionalNotes = [
+                        '<div class="bs-callout bs-callout-default row">',
+                            '<h4>Additional Notes</h4>',
+                            '<p>',
+                                row.AdditionalNotes,
+                            '</p>',
+                        '</div>'].join('');
+
+                    $('#' + subgrid_id).html(hypothesis + additionalNotes);
+                },
+                subGridRowColapsed: function (subgrid_id, row_id) {
+                    // this function is called before removing the data 
+                    //var subgrid_table_id;
+                    //subgrid_table_id = subgrid_id + "_t";
+                    //jQuery("#" + subgrid_table_id).remove();
+                }
+            });
+            $('#' + renderTo).jqGrid('filterToolbar', {
+                stringResult: false,
+                searchOnEnter: false,
+                defaultSearch: 'cn'
+            });
+        }
+    };
+})();

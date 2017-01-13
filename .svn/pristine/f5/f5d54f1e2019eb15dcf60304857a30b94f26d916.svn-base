@@ -1,0 +1,60 @@
+﻿@model TestAndLearn.Domain.Models.UserModel
+
+@{
+    ViewBag.Title = "Index";
+    ViewBag.ActiveSection = "Home";
+    Layout = "~/Views/Layouts/_Master.cshtml";
+}
+
+<h2 class="row">@Model.UserSettings.SelectedClientName</h2>
+
+<div class="row">
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".new-test-modal">New</button>
+    <button type="button" class="btn btn-default">Export</button>
+</div>
+
+<div role="tabpanel">
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist" id="test-tab-panel">
+        <li role="presentation" class="active"><a href="#submitted" aria-controls="submitted" role="tab" data-toggle="tab">Submitted</a></li>
+        <li role="presentation"><a href="#approved" aria-controls="approved" role="tab" data-toggle="tab">Approved</a></li>
+        <li role="presentation"><a href="#closed" aria-controls="closed" role="tab" data-toggle="tab">Closed</a></li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="submitted">
+            <div class="ux-grid-wrapper">
+                <table id="submitted-test-grid"></table>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="approved">
+            <div class="ux-grid-wrapper">
+                <table id="approved-test-grid"></table>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="closed">
+            <div class="ux-grid-wrapper">
+                <table id="closed-test-grid"></table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@{
+    Html.RenderAction("TestForm", "Home", new { id = Model.UserSettings.SelectedClientId });
+}
+
+@section MoreScripts {
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Home/IndexControls.js")"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            TestAndLearn.IndexControls.init({
+                clientId: @Model.UserSettings.SelectedClientId
+            });
+        });
+    </script>
+}

@@ -1,0 +1,7 @@
+﻿@model int
+
+<form id="download-tests-form" action="@Url.Action("DownloadTests", "Home")" method="POST" style="display:inline">
+    <input type="hidden" id="input-download-tests-clientid" name="ClientId" value="@Model" />
+    <input type="hidden" id="input-download-tests-teststatusid" name="TestStatusId" />
+    <button type="submit" class="btn btn-default" id="download-tests-btn">Download</button>
+</form>

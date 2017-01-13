@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="TestAndLearnModelStoreContainer" CdmEntityContainer="TestAndLearnEntitiesConnection">
+    <EntitySetMapping Name="Clients">
+      <EntityTypeMapping TypeName="TestAndLearnModel.Client">
+        <MappingFragment StoreEntitySet="Client">
+          <ScalarProperty Name="LogoImageName" ColumnName="LogoImageName" />
+          <ScalarProperty Name="ClientName" ColumnName="ClientName" />
+          <ScalarProperty Name="ClientId" ColumnName="ClientId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="UserClientMaps">
+      <EntityTypeMapping TypeName="TestAndLearnModel.UserClientMap">
+        <MappingFragment StoreEntitySet="UserClientMap">
+          <ScalarProperty Name="ClientId" ColumnName="ClientId" />
+          <ScalarProperty Name="UserId" ColumnName="UserId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="SuccessMetrics">
+      <EntityTypeMapping TypeName="TestAndLearnModel.SuccessMetric">
+        <MappingFragment StoreEntitySet="SuccessMetric">
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="SuccessMetricId" ColumnName="SuccessMetricId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Tests">
+      <EntityTypeMapping TypeName="TestAndLearnModel.Test">
+        <MappingFragment StoreEntitySet="Test">
+          <ScalarProperty Name="PillarId" ColumnName="PillarId" />
+          <ScalarProperty Name="SuccessMetricId" ColumnName="SuccessMetricId" />
+          <ScalarProperty Name="LevelOfImpact" ColumnName="LevelOfImpact" />
+          <ScalarProperty Name="LevelOfBudget" ColumnName="LevelOfBudget" />
+          <ScalarProperty Name="LevelOfEffortToReportOn" ColumnName="LevelOfEffortToReportOn" />
+          <ScalarProperty Name="LevelOfEffortToImplement" ColumnName="LevelOfEffortToImplement" />
+          <ScalarProperty Name="Recommendation" ColumnName="Recommendation" />
+          <ScalarProperty Name="Outcome" ColumnName="Outcome" />
+          <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+          <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+          <ScalarProperty Name="TestStatusId" ColumnName="TestStatusId" />
+          <ScalarProperty Name="Year" ColumnName="Year" />
+          <ScalarProperty Name="Quarter" ColumnName="Quarter" />
+          <ScalarProperty Name="ExpectedBusinessValue" ColumnName="ExpectedBusinessValue" />
+          <ScalarProperty Name="AdditionalNotes" ColumnName="AdditionalNotes" />
+          <ScalarProperty Name="Hypothesis" ColumnName="Hypothesis" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="SubmittedBy" ColumnName="SubmittedBy" />
+          <ScalarProperty Name="SubmittedOn" ColumnName="SubmittedOn" />
+          <ScalarProperty Name="ClientId" ColumnName="ClientId" />
+          <ScalarProperty Name="TestId" ColumnName="TestId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TestStatus">
+      <EntityTypeMapping TypeName="TestAndLearnModel.TestStatu">
+        <MappingFragment StoreEntitySet="TestStatus">
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="TestStatusId" ColumnName="TestStatusId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TestTypes">
+      <EntityTypeMapping TypeName="TestAndLearnModel.TestType">
+        <MappingFragment StoreEntitySet="TestType">
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="TestTypeId" ColumnName="TestTypeId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <AssociationSetMapping Name="ClientSuccessMetricMap" TypeName="TestAndLearnModel.ClientSuccessMetricMap" StoreEntitySet="ClientSuccessMetricMap">
+      <EndProperty Name="SuccessMetric">
+        <ScalarProperty Name="SuccessMetricId" ColumnName="SuccessMetricId" />
+      </EndProperty>
+      <EndProperty Name="Client">
+        <ScalarProperty Name="ClientId" ColumnName="ClientId" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="ClientTestTypeMap" TypeName="TestAndLearnModel.ClientTestTypeMap" StoreEntitySet="ClientTestTypeMap">
+      <EndProperty Name="TestType">
+        <ScalarProperty Name="TestTypeId" ColumnName="TestTypeId" />
+      </EndProperty>
+      <EndProperty Name="Client">
+        <ScalarProperty Name="ClientId" ColumnName="ClientId" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="TestTestTypeMap" TypeName="TestAndLearnModel.TestTestTypeMap" StoreEntitySet="TestTestTypeMap">
+      <EndProperty Name="TestType">
+        <ScalarProperty Name="TestTypeId" ColumnName="TestTypeId" />
+      </EndProperty>
+      <EndProperty Name="Test">
+        <ScalarProperty Name="TestId" ColumnName="TestId" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <EntitySetMapping Name="UserSettings">
+      <EntityTypeMapping TypeName="TestAndLearnModel.UserSetting">
+        <MappingFragment StoreEntitySet="UserSettings">
+          <ScalarProperty Name="SelectedTheme" ColumnName="SelectedTheme" />
+          <ScalarProperty Name="SelectedClientId" ColumnName="SelectedClientId" />
+          <ScalarProperty Name="UserId" ColumnName="UserId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Events">
+      <EntityTypeMapping TypeName="TestAndLearnModel.Event">
+        <MappingFragment StoreEntitySet="Event">
+          <ScalarProperty Name="ClientId" ColumnName="ClientId" />
+          <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+          <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="EventId" ColumnName="EventId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Pillars">
+      <EntityTypeMapping TypeName="TestAndLearnModel.Pillar">
+        <MappingFragment StoreEntitySet="Pillar">
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="PillarId" ColumnName="PillarId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <AssociationSetMapping Name="ClientPillarMap" TypeName="TestAndLearnModel.ClientPillarMap" StoreEntitySet="ClientPillarMap">
+      <EndProperty Name="Pillar">
+        <ScalarProperty Name="PillarId" ColumnName="PillarId" />
+      </EndProperty>
+      <EndProperty Name="Client">
+        <ScalarProperty Name="ClientId" ColumnName="ClientId" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <EntitySetMapping Name="TestUrls">
+      <EntityTypeMapping TypeName="TestAndLearnModel.TestUrl">
+        <MappingFragment StoreEntitySet="TestUrl">
+          <ScalarProperty Name="Url" ColumnName="Url" />
+          <ScalarProperty Name="TestId" ColumnName="TestId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

@@ -1,0 +1,88 @@
+﻿@model TestAndLearn.Domain.Models.UserModel
+
+@{
+    ViewBag.Title = "Index";
+    ViewBag.ActiveSection = "Home";
+    Layout = "~/Views/Layouts/_Master.cshtml";
+}
+
+<h2 class="row">@Model.UserSettings.SelectedClientName</h2>
+
+<div class="row">
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".new-test-modal">New</button>
+    <button type="button" class="btn btn-default">Export</button>
+</div>
+
+<div role="tabpanel">
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist" id="test-tab-panel">
+        <li role="presentation" class="active"><a href="#submitted" aria-controls="submitted" role="tab" data-toggle="tab">Submitted</a></li>
+        <li role="presentation"><a href="#approved" aria-controls="approved" role="tab" data-toggle="tab">Approved</a></li>
+        <li role="presentation"><a href="#closed" aria-controls="closed" role="tab" data-toggle="tab">Closed</a></li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="submitted">
+            <div class="ux-grid-wrapper">
+                <table id="submitted-test-grid"></table>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="approved">
+            <div class="ux-grid-wrapper">
+                <table id="approved-test-grid"></table>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="closed">
+            <div class="ux-grid-wrapper">
+                <table id="closed-test-grid"></table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@{
+    Html.RenderAction("TestForm", "Home", new { id = Model.UserSettings.SelectedClientId });
+}
+
+@Html.Partial("CloseForm");
+
+@section MoreScripts {
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Home/Grids.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Home/Forms.js")"></script>
+    
+    <script type="text/javascript">
+        var d = {};
+        $(function () {
+            TestAndLearn.Home.Forms.init({});
+
+            TestAndLearn.Home.Grids.init({
+                getTestsUrl: '@Url.Action("GetTests", "api/TestApi")',
+                changeTestStatusUrl: '@Url.Action("ChangeTestStatus", "api/TestApi")',
+                clientId: @Model.UserSettings.SelectedClientId,
+                submittedStatusId: 1,
+                approvedStatusId: 2,
+                closedStatusId: 3
+            });
+
+            $('#test-tab-panel a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                //alert(e.target.toString().indexOf('approved')); // newly activated tab
+                // e.relatedTarget // previous active tab
+                d.e = e;
+                if (e.target.toString().indexOf('submitted') > -1) {
+                    $('#submitted-test-grid').trigger('reloadGrid');
+                }
+                else if (e.target.toString().indexOf('approved') > -1) {
+                    $('#approved-test-grid').setGridWidth($('#approved').width());
+                    $('#approved-test-grid').trigger('reloadGrid');
+                }
+                else if (e.target.toString().indexOf('closed') > -1) {
+                    $('#closed-test-grid').setGridWidth($('#closed').width());
+                    $('#closed-test-grid').trigger('reloadGrid');
+                }
+            })
+        });
+    </script>
+}

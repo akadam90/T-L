@@ -1,0 +1,82 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using TestAndLearn.Domain.Models;
+using TestAndLearn.Domain;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Formatting;
+using System.Web.Http;
+using TestAndLearn.Web.Models;
+
+
+namespace TestAndLearn.Web.Controllers
+{
+    public class EventApiController:BaseApiController
+    {
+        private IEventRepository _eventrepository;
+
+        public EventApiController(IEventRepository eventrepository)
+        {
+            _eventrepository = eventrepository;
+        }
+
+        [HttpGet]
+        public EventBaseModel EditEvent(int id)
+        {
+            return _eventrepository.GetEvent(id);
+        }
+
+        [HttpPost]
+        public ActionResponseModel DeleteEvent([FromBody] EventBaseModel model)
+        {
+            try
+            {
+                _eventrepository.DeleteEvent(model.EventId);
+                return new ActionResponseModel()
+                {
+                    Success = true,
+                    Message = "Event was successfully deleted"
+                };
+            }
+            catch (Exception e)
+            {
+                return new ActionResponseModel() { 
+                Success = false,
+                Message = e.Message
+                };
+            }
+            
+        }
+
+        [HttpPost]
+        public ActionResponseModel SaveEvent([FromBody] EventBaseModel Event)
+        {
+            try
+            {
+                _eventrepository.SaveEvent(Event);
+                return new ActionResponseModel(){
+                   Success = true,
+                   Message = "Event was created and saved successfully"
+            };
+            }
+
+            catch(Exception ex)
+            {
+                return new ActionResponseModel() { 
+                Success= false,
+                Message = ex.Message
+                };
+            }
+        }
+
+        [HttpGet]
+        public IList<EventBaseModel> GetEvents(int ClientId)
+        {
+            return _eventrepository.GetEvents(ClientId);
+
+        }
+
+    }
+}

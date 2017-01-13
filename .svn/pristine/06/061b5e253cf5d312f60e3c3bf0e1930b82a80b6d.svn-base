@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>@ViewBag.Title</title>
+    <link href="@Url.Content("~/Content/jquery/themes/base/minified/jquery-ui.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/jquery/jquery.loadmask.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/jquery/jquery-ui.override.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/jquery/ui.jqgrid.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/jquery/ui.jqgrid-override.css")" rel="stylesheet" />
+
+    <link href="@Url.Content("~/Content/bootstrap/bootstrap.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/bootstrap/bootstrap-" + Session["ActiveTheme"] + "-theme.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/bootstrap/bootstrap-callout.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/bootstrap/bootstrap-slider.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/bootstrap/bootstrap-datepicker.min.css")" rel="stylesheet" />
+    
+    <style>
+        body 
+        {
+            padding-top: 50px;
+        }
+
+        .row {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .slide-in-msg {
+            border: 1px solid #aaaaaa;
+            background-color: white;
+        }
+
+        .slide-in-msg p {
+            text-align: center;
+        }
+
+        .options-btn {
+            width: 24px;
+            padding: 2px;
+            border: 1px solid #888888;
+            border-radius: 4px;
+            background-color: transparent;
+        }
+
+        .options-btn span {
+            background-color: #888888;
+            height: 2px;
+            display: block;
+            margin-top: 2px;
+            margin-bottom: 2px;
+        }
+    </style>
+   
+    @RenderSection("MoreStyles", false)
+</head>
+<body>
+    @{
+        Html.RenderAction("MainNavigation", "Shared", new { activeSection = ViewBag.ActiveSection });
+    }
+
+    <div class="container" style="width: 99%">
+        @RenderBody()
+    </div>
+
+    <!-- Place all script references just before the body closes-->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/jquery-1.10.2.min.js")"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/bootstrap/bootstrap.min.js")"></script>
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/jquery-ui.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/jquery.form.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/jquery.json-2.2.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/jquery.loadmask.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/jquery-ux-msg.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/jquery-ux-popupmenu.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/jquery.jqGrid.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery/grid.locale-en.js")"></script>
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/bootstrap/bootstrap-datepicker.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/bootstrap/bootstrap-slider.js")"></script>
+    <script type="text/javascript">
+    $.jgrid.extend({
+        setColWidth: function (iCol, newWidth, adjustGridWidth) {
+            return this.each(function () {
+                var $self = $(this), grid = this.grid, p = this.p, colName, colModel = p.colModel, i, nCol;
+                if (typeof iCol === "string") {
+                    // the first parametrer is column name instead of index
+                    colName = iCol;
+                    for (i = 0, nCol = colModel.length; i < nCol; i++) {
+                        if (colModel[i].name === colName) {
+                            iCol = i;
+                            break;
+                        }
+                    }
+
+                    if (i >= nCol) {
+                        return; // error: non-existing column name specified as the first parameter
+                    }
+                }
+                else if (typeof iCol !== "number") {
+                    return; // error: wrong parameters
+                }
+
+                grid.resizing = { idx: iCol };
+                grid.headers[iCol].newWidth = newWidth;
+                grid.newWidth = p.tblwidth + newWidth - grid.headers[iCol].width;
+                grid.dragEnd();   // adjust column width
+                if (adjustGridWidth !== false) {
+                $self.jqGrid("setGridWidth", grid.newWidth, false); // adjust grid width too
+                }
+            });
+        }
+    });
+    </script>
+    @RenderSection("MoreScripts", false)
+</body>
+</html>

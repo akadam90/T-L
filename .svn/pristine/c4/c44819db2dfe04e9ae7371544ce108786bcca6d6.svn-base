@@ -1,0 +1,30 @@
+﻿@model TestAndLearn.Domain.Models.UserModel
+
+@{
+    ViewBag.Title = "Calendar";
+    ViewBag.ActiveSection = "Calendar";
+    Layout = "~/Views/Layouts/_Master.cshtml";
+}
+<h2 class="row">@Model.UserSettings.SelectedClientName</h2>
+
+
+    <div id="calendar"> 
+    </div>
+
+@section MoreScripts{
+    
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Home/Calendar.js")"></script>
+    
+    <script type="text/javascript">
+        $(function () {
+            TestAndLearn.Home.Calendar.init({
+                clientId: @Model.UserSettings.SelectedClientId,
+                getTestsEventsUrl : '@Url.Action("GetCalendarData", "api/CalendarApi")'
+                   
+            });
+
+        });
+
+    </script>
+    
+    } 

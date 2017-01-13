@@ -1,0 +1,104 @@
+﻿if (typeof (TestAndLearn) == 'undefined') {
+    var TestAndLearn = {};
+}
+
+if (typeof (TestAndLearn.Home) == 'undefined') {
+    TestAndLearn.Home = {};
+}
+
+TestAndLearn.Home.EventForm = (function () {
+    var _config;
+
+    return {
+        init: function (config) {
+            _config = config;
+            
+            $('#save-event-form').ajaxSubmitWebApi({
+                onBeforeSubmit: function (e) {
+                    $('#EventModal .model-content').mask('Saving Event...');
+                },
+                onSuccess: function (response) {
+                    if (response.Success == true) {
+                        $('#EventModal').modal('hide');
+                        $('#EventModal .model-content').unmask();
+                        
+                        $('#event-grid').jqGrid('setGridParam', { datatype: 'json' }).trigger('reloadGrid');
+
+                        JQueryUX.Msg.SlideIn({
+                            width: 200,
+                            height: 50,
+                            msg: response.Message,
+                            dockAt: 'tc',
+                            wrapperWidthOffset: 8,
+                            wrapperHeightOffset: 8
+                        });
+                    }
+                    else {
+                        alert(response.Message);
+                    }
+                },
+                onError: function (xhr, status, error) {
+                    alert(error);
+                }
+            });
+
+            $('#new-event-btn').click(function () {
+                TestAndLearn.Home.EventForm.newEvent();
+            });
+        }
+
+        , newEvent: function () {
+            $('#EventModal').modal('show');
+            document.getElementById('save-event-form').reset();
+            $('#input-event-ClientId').val(_config.clientId);
+            $('#input-event-EventId').val('0'); //for new Event
+        }
+
+       , editEvent: function (eventId) {
+           $.ajax({
+               url: _config.EditEventUrl,
+               datatype: 'json',
+               type: 'GET',
+               data: {
+                   id: eventId
+               },
+               success: function (response) {
+                   var event = response;
+                   $('#EventModal').modal('show');
+                   document.getElementById('save-event-form').reset();
+                   $('#input-event-EventId').val(event.EventId);
+                   $('#input-event-ClientId').val(event.ClientId);
+                   $('#input-event-name').val(event.EventName);
+                   $('#input-event-description').val(event.EventDescription);
+
+                   var start = new Date(event.StartDate);
+                   var dd = start.getDate();
+                   if (dd < 10)
+                       dd = '0' + dd;
+                   var mm = start.getMonth()+1;
+                   if (mm < 10)
+                       mm = '0' + mm;
+                   var date1 = start.getFullYear() + '-' + mm + '-' + dd;
+                   
+                   var end = new Date(event.EndDate);
+                   var dd1 = end.getDate();
+                   var mm1 = end.getMonth()+1;
+                   if (dd1 < 10)
+                       dd1 = '0' + dd1;
+                   if (mm1 < 10)
+                       mm1 = '0' + mm1;
+                   var date2 = end.getFullYear() + '-' + mm1 + '-' + dd1;
+
+                   $('#event-startdate').val(date1);
+                   $('#event-enddate').val(date2);
+
+               },
+               error: function (xhr, status, error) {
+                   alert(error);
+               }
+
+           });
+
+       }
+    };
+})();

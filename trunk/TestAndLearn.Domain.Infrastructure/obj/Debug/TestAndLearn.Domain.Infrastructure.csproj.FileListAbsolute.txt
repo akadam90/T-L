@@ -1,0 +1,12 @@
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain.Infrastructure\bin\Debug\TestAndLearn.Domain.Infrastructure.dll.config
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain.Infrastructure\bin\Debug\TestAndLearn.Domain.Infrastructure.dll
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain.Infrastructure\bin\Debug\TestAndLearn.Domain.Infrastructure.pdb
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain.Infrastructure\bin\Debug\EntityFramework.dll
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain.Infrastructure\bin\Debug\EntityFramework.SqlServer.dll
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain.Infrastructure\bin\Debug\TestAndLearn.Domain.dll
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain.Infrastructure\bin\Debug\TestAndLearn.Domain.pdb
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain.Infrastructure\bin\Debug\EntityFramework.xml
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain.Infrastructure\bin\Debug\EntityFramework.SqlServer.xml
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain.Infrastructure\obj\Debug\TestAndLearn.Domain.Infrastructure.csprojResolveAssemblyReference.cache
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain.Infrastructure\obj\Debug\TestAndLearn.Domain.Infrastructure.dll
+C:\Projects\TestAndLearn\trunk\TestAndLearn.Domain.Infrastructure\obj\Debug\TestAndLearn.Domain.Infrastructure.pdb

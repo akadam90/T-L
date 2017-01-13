@@ -1,0 +1,92 @@
+﻿@model TestAndLearn.Domain.Models.UserModel
+
+@{
+    ViewBag.Title = "Index";
+    ViewBag.ActiveSection = "Tests";
+    Layout = "~/Views/Layouts/_Master.cshtml";
+}
+
+<div class="row">
+<img src="@Url.Content("~/Images/ClientLogos/" + Model.Clients.Single(f => f.ClientId == Model.UserSettings.SelectedClientId).LogoImageName)" />
+</div>
+
+<div class="row">
+    <button type="button" class="btn btn-primary" id="new-test-btn">New</button>
+    @Html.Partial("DownloadTestsForm", Model.UserSettings.SelectedClientId)
+</div>
+
+<div role="tabpanel">
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist" id="test-tab-panel">
+        <li role="presentation" class="active"><a href="#submitted" aria-controls="submitted" role="tab" data-toggle="tab">Submitted</a></li>
+        <li role="presentation"><a href="#approved" aria-controls="approved" role="tab" data-toggle="tab">Approved</a></li>
+        <li role="presentation"><a href="#closed" aria-controls="closed" role="tab" data-toggle="tab">Closed</a></li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div id="tab-grid-content" class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="submitted">
+            <div class="ux-grid-wrapper">
+                <table id="submitted-test-grid"></table>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="approved">
+            <div class="ux-grid-wrapper">
+                <table id="approved-test-grid"></table>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="closed">
+            <div class="ux-grid-wrapper">
+                <table id="closed-test-grid"></table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section MoreScripts {
+    @if (Model.Role == "Admin") { 
+        <script type="text/javascript" src="@Url.Content("~/Scripts/Home/AdminGrids.js")"></script>
+        //<script type="text/javascript" src="@Url.Content("~/Scripts/Home/TestUrlForm.js")"></script>
+    }
+    else
+    {
+        <script type="text/javascript" src="@Url.Content("~/Scripts/Home/Grids.js")"></script>
+    }
+    
+    <script type="text/javascript">
+        $(function () {
+            TestAndLearn.Home.Grids.init({
+                clientId: @Model.UserSettings.SelectedClientId,
+                getTestsUrl: '@Url.Action("GetTests", "api/TestApi")',
+                getUrls:'@Url.Action("GetUrls","api/TestApi")',
+                changeTestStatusUrl: '@Url.Action("ChangeTestStatus", "api/TestApi")',
+                downloadTestsUrl: '@Url.Action("DownloadTests", "Home")',
+                submittedStatusId: 1,
+                approvedStatusId: 2,
+                closedStatusId: 3
+            });
+        });
+    </script>
+}
+
+@section PartialsWithScripts {
+    @{
+        Html.RenderAction("TestForm", "Home", new { id = Model.UserSettings.SelectedClientId });
+    }
+
+    @Html.Partial("_RankForm")
+    @Html.Partial("_DeleteTest")
+    
+    @Html.Partial("_TestUrlForm")
+
+    @if (Model.Role == "Admin") 
+    { 
+        @Html.Partial("CloseForm")
+        @Html.Partial("RunDatesForm")
+        
+    }
+
+    
+}

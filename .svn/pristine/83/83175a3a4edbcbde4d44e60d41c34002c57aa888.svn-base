@@ -1,0 +1,61 @@
+﻿@model TestAndLearn.Domain.Models.UserModel
+
+@{
+    ViewBag.Title = "Events";
+    ViewBag.ActiveSection = "Events";
+    Layout = "~/Views/Layouts/_Master.cshtml";
+}
+<h2 class="row">@Model.UserSettings.SelectedClientName</h2>
+   
+<div class="row">
+    <button type="button" class="btn btn-primary" id="new-event-btn">New Event</button>
+</div>
+
+    <div class="ux-grid-wrapper">
+        <table id="event-grid"></table>
+    </div>
+
+    @Html.Partial("EventForm")
+    @Html.Partial("_DeleteEvent")
+
+
+    @section MoreScripts{
+        
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Home/Forms.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Home/EventsGrid.js")"></script>
+    
+    <script type="text/javascript">
+        var d = {};
+        $(function () {
+            TestAndLearn.Home.Forms.init({
+                clientId: @Model.UserSettings.SelectedClientId,
+                getTestUrl: '@Url.Action("GetTest", "api/TestApi")',
+                changeTestStatusUrl: '@Url.Action("ChangeTestStatus", "api/TestApi")',
+                getRankUrl: '@Url.Action("GetRank", "api/TestApi")',
+                submittedStatusId: 1,
+                approvedStatusId: 2,
+                closedStatusId: 3,
+                EditEventUrl : '@Url.Action("EditEvent","api/EventApi")'
+            });
+
+            TestAndLearn.Home.EventsGrid.init({
+                clientId: @Model.UserSettings.SelectedClientId,
+                getEventsUrl : '@Url.Action("GetEvents","api/EventApi")'
+                   
+            });
+
+            $('#event-tab-panel a[data-toggle="tab"]').on('shown.bs.tab', function (e){
+                d.e = e;
+                if (e.target.toString().indexOf('event') > -1) {
+                    $('#event-grid').jqGrid('setGridParam', {datatype:'json'}).trigger('reloadGrid');
+
+                }
+            })
+
+
+        });
+
+    </script>
+         
+        
+    }

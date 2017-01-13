@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TestAndLearn.Domain.Models
+{
+    public class CalendarModel
+    {
+
+        public string id { get; set; }
+        public string title { get; set; }
+        public string start { get; set; }       //A Moment-ish input, like an ISO8601 string.
+        public string end { get; set; }
+        public string url { get; set; }
+        public string backgroundColor { get; set; }
+    }
+}
